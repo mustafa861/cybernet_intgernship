@@ -2,18 +2,16 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/auth";
 import type { MonthlyAuditResponse } from "@/types";
 
 export default function AuditPage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { ready } = useAuthGuard();
   const [month, setMonth] = useState("");
   const [data, setData] = useState<MonthlyAuditResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  if (!isAuthenticated) { router.push("/login"); return null; }
+  if (!ready) return null;
 
   const runAudit = async (e: React.FormEvent) => {
     e.preventDefault();

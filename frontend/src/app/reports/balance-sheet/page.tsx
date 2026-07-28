@@ -2,18 +2,16 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/auth";
 import type { BalanceSheetResponse } from "@/types";
 
 export default function BalanceSheetPage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { ready } = useAuthGuard();
   const [asOf, setAsOf] = useState("");
   const [data, setData] = useState<BalanceSheetResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  if (!isAuthenticated) { router.push("/login"); return null; }
+  if (!ready) return null;
 
   const fetchReport = async (e: React.FormEvent) => {
     e.preventDefault();

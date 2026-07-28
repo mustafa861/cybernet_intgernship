@@ -8,7 +8,7 @@ from app.models import Category, Entry
 
 
 def _minor_to_float(amount_minor: int) -> float:
-    return round(amount_minor / 100, 2)
+    return round(float(amount_minor) / 100, 2)
 
 
 def trial_balance(db: Session, user_id: str, as_of: date | None) -> list[dict]:

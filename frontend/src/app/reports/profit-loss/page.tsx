@@ -2,19 +2,17 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/auth";
 import type { ProfitLossResponse } from "@/types";
 
 export default function ProfitLossPage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { ready } = useAuthGuard();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [data, setData] = useState<ProfitLossResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  if (!isAuthenticated) { router.push("/login"); return null; }
+  if (!ready) return null;
 
   const fetchReport = async (e: React.FormEvent) => {
     e.preventDefault();

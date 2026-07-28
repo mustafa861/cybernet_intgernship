@@ -2,22 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/auth";
 import type { TrialBalanceItem } from "@/types";
 
 export default function TrialBalancePage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { ready } = useAuthGuard();
   const [data, setData] = useState<TrialBalanceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) { router.push("/login"); return; }
+    if (!ready) return;
     api.trialBalance().then(setData).catch(() => {}).finally(() => setLoading(false));
-  }, [isAuthenticated, router]);
+  }, [ready]);
 
-  if (!isAuthenticated) return null;
+  if (!ready) return null;
 
   return (
     <div>

@@ -9,6 +9,12 @@ from sqlalchemy.orm import Session
 from app.services import audit_service, entry_service, report_service
 
 
+def _parse_date(s: str) -> date:
+    if len(s) == 7 and s.count("-") == 1:
+        s += "-01"
+    return date.fromisoformat(s)
+
+
 class ToolCall(BaseModel):
     tool: str
     input: dict
@@ -49,7 +55,7 @@ class CreateEntryTool(Tool):
             category_id=params.category_id,
             entry_type=params.entry_type,
             amount=params.amount,
-            entry_date=date.fromisoformat(params.entry_date),
+            entry_date=_parse_date(params.entry_date),
             source=params.source,
             description=params.description,
         )
@@ -87,7 +93,7 @@ class UpdateEntryTool(Tool):
             category_id=params.category_id,
             entry_type=params.entry_type,
             amount=params.amount,
-            entry_date=date.fromisoformat(params.entry_date) if params.entry_date else None,
+            entry_date=_parse_date(params.entry_date) if params.entry_date else None,
             description=params.description,
         )
         return f"Updated entry {params.entry_id}"
@@ -132,8 +138,8 @@ class ListEntriesTool(Tool):
         entries = entry_service.list_entries(
             db=db,
             user_id=user_id,
-            start_date=date.fromisoformat(params.start_date) if params.start_date else None,
-            end_date=date.fromisoformat(params.end_date) if params.end_date else None,
+            start_date=_parse_date(params.start_date) if params.start_date else None,
+            end_date=_parse_date(params.end_date) if params.end_date else None,
             category_id=params.category_id,
             entry_type=params.entry_type,
         )
@@ -157,8 +163,8 @@ class GenerateProfitLossTool(Tool):
         result = report_service.profit_and_loss(
             db=db,
             user_id=user_id,
-            start_date=date.fromisoformat(params.start_date),
-            end_date=date.fromisoformat(params.end_date),
+            start_date=_parse_date(params.start_date),
+            end_date=_parse_date(params.end_date),
         )
         return (
             f"P&L from {params.start_date} to {params.end_date}: "
@@ -183,7 +189,7 @@ class GenerateBalanceSheetTool(Tool):
         result = report_service.balance_sheet(
             db=db,
             user_id=user_id,
-            as_of=date.fromisoformat(params.as_of),
+            as_of=_parse_date(params.as_of),
         )
         return (
             f"Balance Sheet as of {params.as_of}: "
@@ -208,7 +214,7 @@ class GenerateTrialBalanceTool(Tool):
         result = report_service.trial_balance(
             db=db,
             user_id=user_id,
-            as_of=date.fromisoformat(params.as_of) if params.as_of else None,
+            as_of=_parse_date(params.as_of) if params.as_of else None,
         )
         return f"Trial balance: {len(result)} categories"
 
@@ -229,7 +235,7 @@ class RunMonthlyAuditTool(Tool):
         result = audit_service.run_audit(
             db=db,
             user_id=user_id,
-            month=date.fromisoformat(params.month),
+            month=_parse_date(params.month),
         )
         return (
             f"Audited {result['entries_reviewed']} entries, "
@@ -255,8 +261,8 @@ class SummarizeSpendingTool(Tool):
         entries = entry_service.list_entries(
             db=db,
             user_id=user_id,
-            start_date=date.fromisoformat(params.start_date) if params.start_date else None,
-            end_date=date.fromisoformat(params.end_date) if params.end_date else None,
+            start_date=_parse_date(params.start_date) if params.start_date else None,
+            end_date=_parse_date(params.end_date) if params.end_date else None,
             category_id=params.category_id,
         )
         total = sum(e.amount_minor for e in entries) / 100
