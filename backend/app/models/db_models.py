@@ -1,8 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import BigInteger, Date, DateTime, Enum, ForeignKey, Text, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import BigInteger, Date, DateTime, Enum, ForeignKey, Text, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -12,7 +11,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        Uuid, primary_key=True, default=uuid.uuid4
     )
     email: Mapped[str] = mapped_column(Text, unique=True)
     password_hash: Mapped[str] = mapped_column(Text)
@@ -31,10 +30,10 @@ class Category(Base):
     __tablename__ = "categories"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        Uuid, primary_key=True, default=uuid.uuid4
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id")
+        Uuid, ForeignKey("users.id")
     )
     name: Mapped[str] = mapped_column(Text)
     type: Mapped[str] = mapped_column(
@@ -52,13 +51,13 @@ class Entry(Base):
     __tablename__ = "entries"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        Uuid, primary_key=True, default=uuid.uuid4
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id")
+        Uuid, ForeignKey("users.id")
     )
     category_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("categories.id")
+        Uuid, ForeignKey("categories.id")
     )
     entry_type: Mapped[str] = mapped_column(
         Enum("expense", "income", name="entry_type"),
@@ -88,10 +87,10 @@ class AuditFlag(Base):
     __tablename__ = "audit_flags"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        Uuid, primary_key=True, default=uuid.uuid4
     )
     entry_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("entries.id")
+        Uuid, ForeignKey("entries.id")
     )
     month: Mapped[date] = mapped_column(Date)
     reason: Mapped[str] = mapped_column(Text)
