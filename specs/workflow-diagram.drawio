@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="AI Accounting Assistant - Workflow" id="workflow1">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1275" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Swimlane pool -->
+        <mxCell id="pool" value="AI-Powered Accounting Assistant - Request Flow" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;startSize=30;fillColor=#f5f5f5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1560" height="900" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: User -->
+        <mxCell id="laneUser" value="User" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#dae8fc;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="30" width="1560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="u1" value="Types message or fills form&#10;e.g. 'Add office rent 50,000 for July'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;" vertex="1" parent="laneUser">
+          <mxGeometry x="60" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="u2" value="Sees confirmation / updated ledger / report / chart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;" vertex="1" parent="laneUser">
+          <mxGeometry x="1260" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: Frontend -->
+        <mxCell id="laneUI" value="Frontend (Next.js + TypeScript)" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#d5e8d4;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="170" width="1560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" value="Chat UI / Entry forms&#10;capture input" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="laneUI">
+          <mxGeometry x="60" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" value="POST /api/chat or&#10;POST /api/entries" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="laneUI">
+          <mxGeometry x="380" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" value="Renders response:&#10;chat bubble / table / report view" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="laneUI">
+          <mxGeometry x="1000" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: Backend API -->
+        <mxCell id="laneAPI" value="Backend API (FastAPI + Pydantic)" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#ffe6cc;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="310" width="1560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="Validates request&#10;(Pydantic schema)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;" vertex="1" parent="laneAPI">
+          <mxGeometry x="380" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="Routes chat requests to AI Agent;&#10;routes CRUD/report requests directly to services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;" vertex="1" parent="laneAPI">
+          <mxGeometry x="660" y="45" width="240" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="Formats validated response" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;" vertex="1" parent="laneAPI">
+          <mxGeometry x="1000" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: AI Agent -->
+        <mxCell id="laneAgent" value="AI Agent Layer" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#e1d5e7;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="450" width="1560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="g1" value="Interprets natural language;&#10;decides which tool(s) to call" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;" vertex="1" parent="laneAgent">
+          <mxGeometry x="660" y="45" width="240" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="g2" value="Receives tool result(s);&#10;composes natural-language reply" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;" vertex="1" parent="laneAgent">
+          <mxGeometry x="940" y="45" width="240" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: Tools -->
+        <mxCell id="laneTools" value="Tool Registry (typed functions)" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#fff2cc;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="590" width="1560" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="t1" value="create_entry&#10;update_entry / delete_entry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="laneTools">
+          <mxGeometry x="500" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="t2" value="generate_profit_and_loss&#10;generate_balance_sheet&#10;generate_trial_balance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="laneTools">
+          <mxGeometry x="730" y="45" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="t3" value="run_monthly_audit&#10;summarize_spending" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="laneTools">
+          <mxGeometry x="980" y="45" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Lane: Database -->
+        <mxCell id="laneDB" value="PostgreSQL" style="swimlane;horizontal=1;whiteSpace=wrap;html=1;startSize=30;fillColor=#f8cecc;" vertex="1" parent="pool">
+          <mxGeometry x="0" y="740" width="1560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="entries / categories / users / audit_flags" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;" vertex="1" parent="laneDB">
+          <mxGeometry x="660" y="45" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows (user flow) -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="u1" target="f1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="f1" target="f2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="f2" target="a1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a1" target="a2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="chat request" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a2" target="g1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="tool call" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="g1" target="t1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="g1" target="t2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6c" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="g1" target="t3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="SQL query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="t1" target="d1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="t2" target="d1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7c" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="t3" target="d1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" value="structured result" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="t2" target="g2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="natural-language reply" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="g2" target="a3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a3" target="f3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="f3" target="u2"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Direct manual CRUD path bypassing agent -->
+        <mxCell id="e12" value="manual form path (no AI)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#666666;" edge="1" parent="1" source="a2" target="t1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
