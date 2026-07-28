@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from app.routers import auth, categories, chat, entries, reports
+from app.routers import auth, categories, chat, conversations, entries, reports
 
 app = FastAPI(title="Accounting Assistant API", version="0.1.0")
 
@@ -41,3 +41,4 @@ app.include_router(categories.router, prefix="/api")
 app.include_router(entries.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
+app.include_router(conversations.router, prefix="/api")

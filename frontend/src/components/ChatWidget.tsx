@@ -1,31 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "@/lib/api";
 
-export function ChatWidget() {
+interface Props {
+  conversationId?: string | null;
+  onUpdate?: () => void;
+}
+
+export function ChatWidget({ conversationId, onUpdate }: Props) {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
-  const [convId, setConvId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [convId, setConvId] = useState<string | null>(conversationId || null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const send = async () => {
+  useEffect(() => {
+    if (conversationId) {
+      setConvId(conversationId);
+      api.getConversation(conversationId).then((data) => {
+        setMessages(data.messages.map((m) => ({ role: m.role, content: m.content })));
+      }).catch(() => {});
+    } else {
+      setConvId(null);
+      setMessages([]);
+    }
+  }, [conversationId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const send = () => {
     if (!input.trim()) return;
     const msg = input;
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: msg }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: msg },
+      { role: "assistant", content: "" },
+    ]);
     setLoading(true);
-    try {
-      const res = await api.chat(msg, convId);
-      setConvId(res.conversation_id);
-      setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, something went wrong." },
-      ]);
-    }
-    setLoading(false);
+    api.chatStream(
+      msg,
+      convId,
+      (token) => {
+        setMessages((prev) => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (last.role === "assistant") {
+            copy[copy.length - 1] = { ...last, content: last.content + token };
+          }
+          return copy;
+        });
+      },
+      (newConvId) => setConvId(newConvId),
+      () => {
+        setLoading(false);
+        onUpdate?.();
+      },
+    );
   };
 
   return (
@@ -39,7 +73,7 @@ export function ChatWidget() {
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`p-3 rounded-lg max-w-[80%] ${
+            className={`p-3 rounded-lg max-w-[80%] whitespace-pre-wrap ${
               m.role === "user"
                 ? "bg-blue-600 text-white ml-auto"
                 : "bg-gray-100 text-gray-900"
@@ -49,6 +83,7 @@ export function ChatWidget() {
           </div>
         ))}
         {loading && <div className="text-gray-400 text-sm">Thinking...</div>}
+        <div ref={bottomRef} />
       </div>
       <div className="border-t p-3 flex gap-2">
         <input

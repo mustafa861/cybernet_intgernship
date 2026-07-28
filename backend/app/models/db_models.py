@@ -24,6 +24,9 @@ class User(Base):
         "Category", back_populates="user"
     )
     entries: Mapped[list["Entry"]] = relationship("Entry", back_populates="user")
+    conversations: Mapped[list["Conversation"]] = relationship(
+        "Conversation", back_populates="user"
+    )
 
 
 class Category(Base):
@@ -102,3 +105,47 @@ class AuditFlag(Base):
     )
 
     entry: Mapped["Entry"] = relationship("Entry", back_populates="audit_flags")
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("users.id")
+    )
+    title: Mapped[str] = mapped_column(Text, default="New Chat")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="conversations")
+    messages: Mapped[list["ChatMessage"]] = relationship(
+        "ChatMessage", back_populates="conversation", order_by="ChatMessage.created_at",
+        cascade="all, delete-orphan"
+    )
+
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4
+    )
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("conversations.id")
+    )
+    role: Mapped[str] = mapped_column(Text)
+    content: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    conversation: Mapped["Conversation"] = relationship(
+        "Conversation", back_populates="messages"
+    )

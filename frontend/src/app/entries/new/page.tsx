@@ -3,20 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthGuard } from "@/lib/auth";
 import { EntryForm } from "@/components/EntryForm";
 import type { Category } from "@/types";
 
 export default function NewEntryPage() {
-  const { isAuthenticated } = useAuth();
+  const { ready } = useAuthGuard();
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) { router.push("/login"); return; }
-    api.listCategories().then(setCategories);
-  }, [isAuthenticated, router]);
+    if (!ready) return;
+    api.listCategories().then(setCategories).catch(() => {});
+  }, [ready]);
 
   const handleSubmit = async (data: {
     entry_type: string;
@@ -30,7 +30,7 @@ export default function NewEntryPage() {
     router.push("/entries");
   };
 
-  if (!isAuthenticated) return null;
+  if (!ready) return null;
 
   return (
     <div>

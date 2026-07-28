@@ -79,6 +79,29 @@ export interface MonthlyAuditResponse {
   entries_reviewed: number;
 }
 
+export interface ChatMessageResponse {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+}
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+}
+
+export interface ConversationDetail {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: ChatMessageResponse[];
+}
+
 export interface ChatResponse {
   conversation_id: string;
   reply: string;

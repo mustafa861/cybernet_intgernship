@@ -3,20 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/auth";
 import type { Entry } from "@/types";
 
 export default function EntriesPage() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { ready } = useAuthGuard();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) { router.push("/login"); return; }
+    if (!ready) return;
     api.listEntries().then(setEntries).catch(() => {}).finally(() => setLoading(false));
-  }, [isAuthenticated, router]);
+  }, [ready]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this entry?")) return;
@@ -24,7 +22,7 @@ export default function EntriesPage() {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   };
 
-  if (!isAuthenticated) return null;
+  if (!ready) return null;
 
   return (
     <div>

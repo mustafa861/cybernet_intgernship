@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 const navItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Entries", href: "/entries" },
+  { label: "Categories", href: "/categories" },
   { label: "Reports", href: "/reports" },
   { label: "Audit", href: "/audit" },
   { label: "Chat", href: "/chat" },

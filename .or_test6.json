@@ -1,0 +1,1 @@
+{"model":"anthropic/claude-opus-5-fast","messages":[{"role":"user","content":"list my entries"}],"temperature":0.1,"max_tokens":500}

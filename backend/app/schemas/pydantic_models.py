@@ -132,6 +132,29 @@ class MonthlyAuditResponse(BaseModel):
     entries_reviewed: int
 
 
+class ConversationSummary(BaseModel):
+    id: uuid.UUID
+    title: str
+    created_at: datetime
+    updated_at: datetime
+    message_count: int = 0
+
+
+class ChatMessageResponse(BaseModel):
+    id: uuid.UUID
+    role: str
+    content: str
+    created_at: datetime
+
+
+class ConversationDetail(BaseModel):
+    id: uuid.UUID
+    title: str
+    created_at: datetime
+    updated_at: datetime
+    messages: list[ChatMessageResponse]
+
+
 class ChatRequest(BaseModel):
     message: str
     conversation_id: uuid.UUID | None = None
