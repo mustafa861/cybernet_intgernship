@@ -35,14 +35,14 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6 sm:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
           <p className="text-sm text-gray-500 mt-1">Organize your income and expense types</p>
         </div>
       </div>
 
-      <form onSubmit={handleCreate} className="card p-5 mb-8 max-w-lg flex items-end gap-3">
+      <form onSubmit={handleCreate} className="card p-5 mb-8 max-w-lg flex flex-col sm:flex-row sm:items-end gap-3">
         <div className="flex-1">
           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Name</label>
           <input
@@ -80,6 +80,7 @@ export default function CategoriesPage() {
         <div className="card"><div className="empty-state">No categories yet. Create one above.</div></div>
       ) : (
         <div className="card overflow-hidden max-w-lg">
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -100,6 +101,7 @@ export default function CategoriesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

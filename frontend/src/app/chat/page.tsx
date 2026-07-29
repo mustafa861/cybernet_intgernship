@@ -31,7 +31,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] gap-0 -m-8">
+    <div className="flex h-[calc(100vh-4rem)] gap-0 -m-4 sm:-m-6 lg:-m-8">
       <div className="hidden md:block w-72 shrink-0 border-r border-gray-200">
         <ChatHistory
           activeId={convId}

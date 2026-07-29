@@ -36,6 +36,7 @@ export default function TrialBalancePage() {
         <div className="card"><div className="empty-state">No data available.</div></div>
       ) : (
         <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -60,6 +61,7 @@ export default function TrialBalancePage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

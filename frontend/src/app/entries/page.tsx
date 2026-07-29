@@ -27,12 +27,12 @@ export default function EntriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Entries</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your income and expense records</p>
         </div>
-        <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2">
+        <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto">
           <Plus className="w-4 h-4" /> New Entry
         </Link>
       </div>

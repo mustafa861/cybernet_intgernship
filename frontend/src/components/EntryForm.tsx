@@ -48,7 +48,7 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="card p-6 max-w-lg space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
@@ -109,7 +109,7 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
           <input
