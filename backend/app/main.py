@@ -31,8 +31,8 @@ app = FastAPI(title="Accounting Assistant API", version="0.1.0", lifespan=lifesp
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://caacountingai-pi.vercel.app",
-        "https://cybernet-intgernship.vercel.app",
+        "https://caaccountingai-p1.vercel.app",
+        "https://cybernet-internship.vercel.app",
         "http://localhost:3000",
         "http://localhost:8000",
     ],
