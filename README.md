@@ -12,6 +12,13 @@ A full-stack AI-powered accounting assistant built with FastAPI, Next.js, and Po
 | Auth    | bcrypt + JWT                                  |
 | DevOps  | Docker Compose (db + backend + frontend)      |
 
+## Vercel Deployment
+
+1. Push repo to GitHub
+2. Import into Vercel
+3. In project **Settings → General**, set **Root Directory** to `frontend/`
+4. Deploy — Vercel auto-detects Next.js from there
+
 ## Quick Start — Docker
 
 ```bash
