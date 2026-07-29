@@ -1,15 +1,31 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+from app.database import Base, engine
+from app.models import User, Category, Entry, AuditFlag, Conversation, ChatMessage  # noqa: F401
 from app.routers import auth, categories, chat, conversations, entries, reports
 
-app = FastAPI(title="Accounting Assistant API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(title="Accounting Assistant API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://caacountingai-pi.vercel.app",
+        "https://cybernet-intgernship.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:8000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
