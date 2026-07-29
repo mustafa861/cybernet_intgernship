@@ -34,6 +34,8 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    email: str
+    business_name: str
 
 
 class CategoryResponse(BaseModel):

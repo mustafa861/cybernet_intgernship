@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuthGuard } from "@/lib/auth";
+import { useAuthGuard, useAuth } from "@/lib/auth";
 import { ChatWidget } from "@/components/ChatWidget";
 import { ChatHistory } from "@/components/ChatHistory";
 import type { ConversationSummary } from "@/types";
 import { api } from "@/lib/api";
-import { Menu, MessageSquareText } from "lucide-react";
+import { Menu, MessageSquareText, User } from "lucide-react";
 
 export default function ChatPage() {
   const { ready } = useAuthGuard();
+  const { user } = useAuth();
   const [convId, setConvId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -56,17 +57,25 @@ export default function ChatPage() {
       )}
 
       <div className="flex-1 flex flex-col min-w-0 bg-white">
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 md:hidden">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
-          <div className="flex items-center gap-2">
-            <MessageSquareText className="w-5 h-5 text-primary-600" />
-            <h1 className="text-lg font-bold text-gray-900">AI Assistant</h1>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="flex items-center gap-2">
+              <MessageSquareText className="w-5 h-5 text-primary-600" />
+              <h1 className="text-lg font-bold text-gray-900">AI Assistant</h1>
+            </div>
           </div>
+          {user && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">{user.business_name}</span>
+            </div>
+          )}
         </div>
         <div className="flex-1 p-6">
           <ChatWidget

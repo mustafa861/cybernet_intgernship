@@ -57,7 +57,7 @@ class ApiClient {
   }
 
   login(email: string, password: string) {
-    return this.request<{ access_token: string; token_type: string }>(
+    return this.request<{ access_token: string; token_type: string; email: string; business_name: string }>(
       "POST",
       "/auth/login",
       { email, password }

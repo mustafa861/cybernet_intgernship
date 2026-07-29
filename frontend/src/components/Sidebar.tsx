@@ -52,7 +52,7 @@ export function Sidebar() {
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">AI</span>
             </div>
-            <span className="text-lg font-bold text-gray-900">Accounting AI</span>
+            <span className="text-lg font-bold text-gray-900">AI Accounting CA</span>
           </Link>
           <button
             onClick={() => setOpen(false)}

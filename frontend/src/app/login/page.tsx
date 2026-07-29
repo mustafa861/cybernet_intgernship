@@ -30,7 +30,7 @@ export default function LoginPage() {
           <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">AI</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+          <h1 className="text-2xl font-bold text-gray-900">AI Accounting CA</h1>
           <p className="text-sm text-gray-500 mt-1">Sign in to your accounting dashboard</p>
         </div>
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">

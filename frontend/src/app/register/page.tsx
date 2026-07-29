@@ -31,7 +31,7 @@ export default function RegisterPage() {
           <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">AI</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
+          <h1 className="text-2xl font-bold text-gray-900">AI Accounting CA</h1>
           <p className="text-sm text-gray-500 mt-1">Get started with AI-powered accounting</p>
         </div>
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
