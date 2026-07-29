@@ -409,33 +409,31 @@ def run_agent(
         return f"API error: {e!s}", [], None
 
     actions_taken: list[ToolCall] = []
-    tool_call = _parse_tool_call(raw_response)
+    tool_calls = _parse_tool_calls(raw_response)
 
-    if tool_call:
-        tool = get_tool(tool_call["tool"])
-        if tool:
+    if tool_calls:
+        textual = _strip_tool_block(raw_response)
+        result_lines = []
+        for tc in tool_calls:
+            tool = get_tool(tc["tool"])
+            if not tool:
+                result_lines.append(f"Unknown tool: {tc['tool']}")
+                continue
             try:
-                result = tool.execute(db, user_id, **tool_call["arguments"])
+                result = tool.execute(db, user_id, **tc["arguments"])
                 actions_taken.append(
-                    ToolCall(
-                        tool=tool.name,
-                        input=tool_call["arguments"],
-                        result_summary=result,
-                    )
+                    ToolCall(tool=tool.name, input=tc["arguments"], result_summary=result)
                 )
-                textual = _strip_tool_block(raw_response)
-                final_response = f"{textual}\n\n{result}" if textual else result
-                conversation_history.append({"role": "assistant", "content": final_response})
-                return final_response, actions_taken, None
+                result_lines.append(result)
             except Exception as e:
                 actions_taken.append(
-                    ToolCall(
-                        tool=tool.name,
-                        input=tool_call["arguments"],
-                        result_summary=f"Error: {e!s}",
-                    )
+                    ToolCall(tool=tool.name, input=tc["arguments"], result_summary=f"Error: {e!s}")
                 )
-                return f"Sorry, I encountered an error: {e!s}", actions_taken, None
+                result_lines.append(f"Error running {tc['tool']}: {e!s}")
+        combined = "\n".join(result_lines)
+        final_response = f"{textual}\n\n{combined}" if textual else combined
+        conversation_history.append({"role": "assistant", "content": final_response})
+        return final_response, actions_taken, None
 
     conversation_history.append({"role": "assistant", "content": raw_response})
     return raw_response, actions_taken, None
@@ -466,7 +464,10 @@ def _call_llm(system: str, messages: list) -> str:
 
     api_key = settings.ai_api_key
     if api_key:
-        return _call_openai(system, messages, api_key)
+        try:
+            return _call_openai(system, messages, api_key)
+        except Exception:
+            return _mock_llm(system, messages)
     return _mock_llm(system, messages)
 
 
@@ -474,99 +475,126 @@ def _mock_llm(system: str, messages: list) -> str:
     last_message = messages[-1]["content"] if messages else ""
     lower = last_message.lower()
 
-    if "add" in lower or "create" in lower or "new entry" in lower or "daal" in lower or "jama" in lower or "likh" in lower:
-        return json.dumps(
-            {
+    def _extract_names(text: str) -> list[str]:
+        import re
+        stop_words = {"category", "categories", "income", "expense", "create", "add",
+                      "new", "entry", "for", "as", "and", "the", "a", "an", "of", "with",
+                      "5000", "2000", "1500", "(", ")", "/month", "", "then"}
+        colon_split = re.split(r'[:;]', text, maxsplit=1)
+        relevant = colon_split[-1]
+        parts = re.split(r'[,;]\s*|\s+and\s+', relevant)
+        cleaned = []
+        for p in parts:
+            p = p.strip().lower().rstrip(".")
+            words = p.split()
+            clean_words = [w for w in words if w not in stop_words and not w.isdigit()]
+            if clean_words:
+                name = clean_words[0].capitalize()
+                if name not in cleaned:
+                    cleaned.append(name)
+        return cleaned if len(cleaned) > 1 else []
+
+    calls = []
+
+    # Detect bulk category creation: "create categories rent, electricity, internet"
+    if ("categorie" in lower or "category" in lower) and ("create" in lower or "add" in lower or "new" in lower or "ban" in lower):
+        names = _extract_names(last_message)
+        if names:
+            for name in names:
+                calls.append({
+                    "tool": "create_category",
+                    "arguments": {"name": name, "category_type": "expense" if "income" not in lower else "income"},
+                })
+        else:
+            calls.append({"tool": "create_category", "arguments": {"name": "ASK_USER_FOR_NAME", "category_type": "ASK_USER_FOR_TYPE"}})
+
+    # Detect bulk entry creation: "add expense 5000 for rent, add income 3000 for freelance"
+    if not calls and ("add" in lower or "new entry" in lower or "daal" in lower or "jama" in lower or "likh" in lower):
+        import re
+        entries = re.findall(r'(expense|income)\s+(\d+[\d,.]*)\s+for\s+(\w+)', lower)
+        if entries:
+            for etype, amount, cat in entries:
+                amt = float(amount.replace(",", ""))
+                calls.append({
+                    "tool": "create_entry",
+                    "arguments": {
+                        "entry_type": etype,
+                        "category_id": "REQUIRES_CATEGORY_ID",
+                        "amount": amt,
+                        "entry_date": date.today().isoformat(),
+                        "description": cat,
+                        "source": "ai_agent",
+                    },
+                })
+        else:
+            calls.append({
                 "tool": "create_entry",
                 "arguments": {
-                    "entry_type": "expense",
+                    "entry_type": "expense" if "income" not in lower else "income",
                     "category_id": "REQUIRES_CATEGORY_ID",
                     "amount": 0.0,
                     "entry_date": date.today().isoformat(),
                     "description": None,
                     "source": "ai_agent",
                 },
-            }
-        )
-    if "p&l" in lower or "profit" in lower or "loss" in lower or "manaafa" in lower or "nuqsan" in lower:
-        return json.dumps(
-            {
-                "tool": "generate_profit_and_loss",
-                "arguments": {
-                    "start_date": date.today().replace(day=1).isoformat(),
-                    "end_date": date.today().isoformat(),
-                },
-            }
-        )
-    if "balance sheet" in lower:
-        return json.dumps(
-            {
-                "tool": "generate_balance_sheet",
-                "arguments": {"as_of": date.today().isoformat()},
-            }
-        )
-    if "trial" in lower:
-        return json.dumps(
-            {
-                "tool": "generate_trial_balance",
-                "arguments": {"as_of": date.today().isoformat()},
-            }
-        )
-    if "audit" in lower:
-        return json.dumps(
-            {
-                "tool": "run_monthly_audit",
-                "arguments": {"month": date.today().replace(day=1).isoformat()},
-            }
-        )
-    if "delete" in lower or "remove" in lower or "hata" in lower or "delete" in lower:
-        return json.dumps(
-            {
-                "tool": "delete_entry",
-                "arguments": {"entry_id": "ASK_USER_FOR_ID"},
-            }
-        )
-    if "list" in lower or "show" in lower or "find" in lower or "dikha" in lower or "bata" in lower or "dekh" in lower or "search" in lower:
-        return json.dumps(
-            {
-                "tool": "list_entries",
-                "arguments": {},
-            }
-        )
-    if "spend" in lower or "total" in lower or "how much" in lower or "kitna" in lower or "kul" in lower or "kharacha" in lower:
-        return json.dumps(
-            {
-                "tool": "summarize_spending",
-                "arguments": {},
-            }
-        )
-    if "update" in lower or "edit" in lower or "change" in lower or "badal" in lower:
-        return json.dumps(
-            {
-                "tool": "update_entry",
-                "arguments": {
-                    "entry_id": "ASK_USER_FOR_ID",
-                    "amount": 0.0,
-                },
-            }
-        )
-    if "create category" in lower or "new category" in lower or "add category" in lower or "category ban" in lower or "category bana" in lower:
-        return json.dumps(
-            {
-                "tool": "create_category",
-                "arguments": {
-                    "name": "ASK_USER_FOR_NAME",
-                    "category_type": "ASK_USER_FOR_TYPE",
-                },
-            }
-        )
-    if "list category" in lower or "show category" in lower or "categories" in lower or "category dikha" in lower:
-        return json.dumps(
-            {
-                "tool": "list_categories",
-                "arguments": {},
-            }
-        )
+            })
+
+    if not calls and ("p&l" in lower or "profit" in lower or "loss" in lower or "manaafa" in lower or "nuqsan" in lower):
+        calls.append({
+            "tool": "generate_profit_and_loss",
+            "arguments": {"start_date": date.today().replace(day=1).isoformat(), "end_date": date.today().isoformat()},
+        })
+
+    if not calls and "balance sheet" in lower:
+        calls.append({
+            "tool": "generate_balance_sheet",
+            "arguments": {"as_of": date.today().isoformat()},
+        })
+
+    if not calls and "trial" in lower:
+        calls.append({
+            "tool": "generate_trial_balance",
+            "arguments": {"as_of": date.today().isoformat()},
+        })
+
+    if not calls and "audit" in lower:
+        calls.append({
+            "tool": "run_monthly_audit",
+            "arguments": {"month": date.today().replace(day=1).isoformat()},
+        })
+
+    if not calls and ("delete" in lower or "remove" in lower or "hata" in lower):
+        calls.append({
+            "tool": "delete_entry",
+            "arguments": {"entry_id": "ASK_USER_FOR_ID"},
+        })
+
+    if not calls and ("list" in lower or "show" in lower or "find" in lower or "dikha" in lower or "bata" in lower or "dekh" in lower or "search" in lower):
+        calls.append({
+            "tool": "list_entries",
+            "arguments": {},
+        })
+
+    if not calls and ("spend" in lower or "total" in lower or "how much" in lower or "kitna" in lower or "kul" in lower or "kharacha" in lower):
+        calls.append({
+            "tool": "summarize_spending",
+            "arguments": {},
+        })
+
+    if not calls and ("update" in lower or "edit" in lower or "change" in lower or "badal" in lower):
+        calls.append({
+            "tool": "update_entry",
+            "arguments": {"entry_id": "ASK_USER_FOR_ID", "amount": 0.0},
+        })
+
+    if not calls and ("list category" in lower or "show category" in lower or "categories" in lower or "category dikha" in lower):
+        calls.append({
+            "tool": "list_categories",
+            "arguments": {},
+        })
+
+    if calls:
+        return json.dumps(calls) if len(calls) > 1 else json.dumps(calls[0])
 
     return (
         "I can help you manage your business finances. You can ask me to:\n"
@@ -611,23 +639,40 @@ def _call_openai(system: str, messages: list, api_key: str) -> str:
 def _strip_tool_block(response: str) -> str:
     import re as _re
     if '```' in response:
-        cleaned = _re.sub(r'```(?:json)?\s*\n?.*?\n?```', '', response, count=1, flags=_re.DOTALL)
+        cleaned = _re.sub(r'```(?:json)?\s*\n?.*?\n?```', '', response, flags=_re.DOTALL)
     else:
-        cleaned = _re.sub(r'\s*\{[^{}]*"tool"[^{}]*"arguments"[^{}]*\}\s*', '', response, count=1)
+        cleaned = _re.sub(r'\s*\[[^\[\]]*"tool"[^\[\]]*"arguments"[^\[\]]*\]\s*', '', response)
+        cleaned = _re.sub(r'\s*\{[^{}]*"tool"[^{}]*"arguments"[^{}]*\}\s*', '', cleaned)
     return cleaned.strip()
 
 
-def _parse_tool_call(response: str) -> dict | None:
+def _parse_tool_calls(response: str) -> list[dict]:
     import re as _re
-    candidates = []
+    candidates = [response]
     candidates.extend(_re.findall(r'```(?:json)?\s*\n?(.*?)\n?```', response, _re.DOTALL))
-    candidates.extend(_re.findall(r'\{[^{}]*"tool"[^{}]*"arguments"[^{}]*\}', response))
-    candidates.append(response)
     for c in candidates:
         try:
             parsed = json.loads(c)
             if isinstance(parsed, dict) and "tool" in parsed and "arguments" in parsed:
-                return parsed
+                return [parsed]
+            if isinstance(parsed, list):
+                valid = [p for p in parsed if isinstance(p, dict) and "tool" in p and "arguments" in p]
+                if valid:
+                    return valid
         except (json.JSONDecodeError, TypeError):
             continue
-    return None
+    # fallback: split by newlines and collect all valid tool objects (handles adjacent JSON)
+    result = []
+    for line in response.strip().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            parsed = json.loads(line)
+            if isinstance(parsed, dict) and "tool" in parsed and "arguments" in parsed:
+                result.append(parsed)
+        except (json.JSONDecodeError, TypeError):
+            continue
+    if result:
+        return result
+    return []
