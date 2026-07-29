@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -6,23 +5,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from app.database import Base, engine
-from app.models import User, Category, Entry, AuditFlag, Conversation, ChatMessage  # noqa: F401
 from app.routers import auth, categories, chat, conversations, entries, reports
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        loop = asyncio.get_event_loop()
-        await asyncio.wait_for(
-            loop.run_in_executor(None, Base.metadata.create_all, bind=engine),
-            timeout=15,
-        )
-    except asyncio.TimeoutError:
-        print("[startup] Table creation timed out (cold DB) — continuing")
-    except Exception as e:
-        print(f"[startup] Table creation skipped: {e}")
     yield
 
 
