@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -13,7 +14,13 @@ from app.routers import auth, categories, chat, conversations, entries, reports
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        Base.metadata.create_all(bind=engine)
+        loop = asyncio.get_event_loop()
+        await asyncio.wait_for(
+            loop.run_in_executor(None, Base.metadata.create_all, bind=engine),
+            timeout=15,
+        )
+    except asyncio.TimeoutError:
+        print("[startup] Table creation timed out (cold DB) — continuing")
     except Exception as e:
         print(f"[startup] Table creation skipped: {e}")
     yield
