@@ -50,7 +50,7 @@ class CategoryCreateRequest(BaseModel):
 class EntryCreateRequest(BaseModel):
     entry_type: str = Field(pattern=r"^(expense|income)$")
     category_id: uuid.UUID
-    amount: float = Field(gt=0)
+    amount: float = Field(gt=0, lt=1_000_000_000)
     entry_date: date
     description: str | None = None
     source: str = Field(default="manual", pattern=r"^(manual|ai_agent)$")
@@ -59,7 +59,7 @@ class EntryCreateRequest(BaseModel):
 class EntryUpdateRequest(BaseModel):
     entry_type: str | None = Field(default=None, pattern=r"^(expense|income)$")
     category_id: uuid.UUID | None = None
-    amount: float | None = Field(default=None, gt=0)
+    amount: float | None = Field(default=None, gt=0, lt=1_000_000_000)
     entry_date: date | None = None
     description: str | None = None
 

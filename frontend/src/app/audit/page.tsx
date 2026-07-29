@@ -17,7 +17,7 @@ export default function AuditPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.monthlyAudit(month);
+      const res = await api.monthlyAudit(month + "-01");
       setData(res);
     } catch {}
     setLoading(false);
@@ -30,7 +30,7 @@ export default function AuditPage() {
         <input
           type="month"
           value={month}
-          onChange={(e) => setMonth(e.target.value + "-01")}
+          onChange={(e) => setMonth(e.target.value)}
           required
           className="border rounded-md px-3 py-2"
         />
