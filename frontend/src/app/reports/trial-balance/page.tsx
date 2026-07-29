@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { TrialBalanceItem } from "@/types";
+import { Scale } from "lucide-react";
 
 export default function TrialBalancePage() {
   const { ready } = useAuthGuard();
@@ -19,32 +20,41 @@ export default function TrialBalancePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Trial Balance</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+          <Scale className="w-5 h-5 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Trial Balance</h1>
+          <p className="text-sm text-gray-500 mt-1">Category totals grouped by type</p>
+        </div>
+      </div>
+
       {loading ? (
-        <p className="text-gray-400">Loading...</p>
+        <div className="card"><div className="empty-state">Loading...</div></div>
       ) : data.length === 0 ? (
-        <p className="text-gray-400">No data.</p>
+        <div className="card"><div className="empty-state">No data available.</div></div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left px-4 py-3">Category</th>
-                <th className="text-left px-4 py-3">Type</th>
-                <th className="text-right px-4 py-3">Total</th>
+        <div className="card overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="table-header px-6 py-4">Category</th>
+                <th className="table-header px-6 py-4">Type</th>
+                <th className="table-header px-6 py-4 text-right">Total</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-100">
               {data.map((item, i) => (
-                <tr key={i} className="border-t">
-                  <td className="px-4 py-3">{item.category}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-gray-100">
+                <tr key={i} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-primary-50/30 transition-colors`}>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.category}</td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                       {item.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {item.total.toLocaleString()}
+                  <td className="px-6 py-4 text-right font-semibold text-gray-900">
+                    ${item.total.toLocaleString()}
                   </td>
                 </tr>
               ))}

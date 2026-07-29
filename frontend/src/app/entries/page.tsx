@@ -5,6 +5,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { Entry } from "@/types";
+import { Plus, Pencil, Trash2, ArrowRightLeft } from "lucide-react";
 
 export default function EntriesPage() {
   const { ready } = useAuthGuard();
@@ -26,70 +27,73 @@ export default function EntriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Entries</h1>
-        <Link
-          href="/entries/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          New Entry
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Entries</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage your income and expense records</p>
+        </div>
+        <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2">
+          <Plus className="w-4 h-4" /> New Entry
         </Link>
       </div>
+
       {loading ? (
-        <p className="text-gray-400">Loading...</p>
+        <div className="card"><div className="empty-state">Loading...</div></div>
       ) : entries.length === 0 ? (
-        <p className="text-gray-400">No entries yet.</p>
+        <div className="card"><div className="empty-state">No entries yet.</div></div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left px-4 py-3">Type</th>
-                <th className="text-left px-4 py-3">Amount</th>
-                <th className="text-left px-4 py-3">Date</th>
-                <th className="text-left px-4 py-3">Description</th>
-                <th className="text-left px-4 py-3">Source</th>
-                <th className="text-right px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((e) => (
-                <tr key={e.id} className="border-t">
-                  <td className="px-4 py-3">
-                    <span
-                      className={`text-xs font-medium px-2 py-0.5 rounded ${
-                        e.entry_type === "expense"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {e.entry_type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-medium">
-                    {(e.amount_minor / 100).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{e.entry_date}</td>
-                  <td className="px-4 py-3 text-gray-600">{e.description || "—"}</td>
-                  <td className="px-4 py-3 text-gray-600">{e.source}</td>
-                  <td className="px-4 py-3 text-right space-x-2">
-                    <Link
-                      href={`/entries/${e.id}/edit`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(e.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="table-header px-6 py-4">Type</th>
+                  <th className="table-header px-6 py-4">Amount</th>
+                  <th className="table-header px-6 py-4">Date</th>
+                  <th className="table-header px-6 py-4">Description</th>
+                  <th className="table-header px-6 py-4">Source</th>
+                  <th className="table-header px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {entries.map((e, i) => (
+                  <tr key={e.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-primary-50/30 transition-colors`}>
+                    <td className="px-6 py-4">
+                      <span className={e.entry_type === "expense" ? "badge-expense" : "badge-income"}>
+                        {e.entry_type === "expense" ? "Expense" : "Income"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">
+                      ${(e.amount_minor / 100).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{e.entry_date}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{e.description || <span className="text-gray-300">&mdash;</span>}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                        {e.source}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link
+                          href={`/entries/${e.id}/edit`}
+                          className="p-2 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(e.id)}
+                          className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

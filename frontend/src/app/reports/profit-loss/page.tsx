@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { ProfitLossResponse } from "@/types";
+import { TrendingUp, TrendingDown, Calculator, Search } from "lucide-react";
 
 export default function ProfitLossPage() {
   const { ready } = useAuthGuard();
@@ -26,64 +27,93 @@ export default function ProfitLossPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Profit & Loss</h1>
-      <form onSubmit={fetchReport} className="flex gap-3 mb-6">
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          required
-          className="border rounded-md px-3 py-2"
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          required
-          className="border rounded-md px-3 py-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? "Loading..." : "Generate"}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Profit & Loss</h1>
+        <p className="text-sm text-gray-500 mt-1">Income, expenses, and net profit for a period</p>
+      </div>
+
+      <form onSubmit={fetchReport} className="card p-5 mb-8 flex flex-wrap items-end gap-3">
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Start Date</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="input-field" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">End Date</label>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required className="input-field" />
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary inline-flex items-center gap-2">
+          <Search className="w-4 h-4" /> {loading ? "Loading..." : "Generate"}
         </button>
       </form>
+
       {data && (
         <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Income</p>
-              <p className="text-xl font-bold text-green-600">{data.total_income.toLocaleString()}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="stat-card">
+              <div className="w-12 h-12 rounded-lg bg-income-light flex items-center justify-center shrink-0">
+                <TrendingUp className="w-6 h-6 text-income" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Income</p>
+                <p className="text-2xl font-bold text-income-dark mt-0.5">${data.total_income.toLocaleString()}</p>
+              </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Expenses</p>
-              <p className="text-xl font-bold text-red-600">{data.total_expenses.toLocaleString()}</p>
+            <div className="stat-card">
+              <div className="w-12 h-12 rounded-lg bg-expense-light flex items-center justify-center shrink-0">
+                <TrendingDown className="w-6 h-6 text-expense" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Expenses</p>
+                <p className="text-2xl font-bold text-expense mt-0.5">${data.total_expenses.toLocaleString()}</p>
+              </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Net Profit</p>
-              <p className="text-xl font-bold text-blue-600">{data.net_profit.toLocaleString()}</p>
+            <div className="stat-card">
+              <div className="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                <Calculator className={`w-6 h-6 ${data.net_profit >= 0 ? "text-income" : "text-expense"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Net Profit</p>
+                <p className={`text-2xl font-bold mt-0.5 ${data.net_profit >= 0 ? "text-income-dark" : "text-expense"}`}>
+                  ${data.net_profit.toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg border p-4">
-              <h3 className="font-semibold mb-3">Income</h3>
-              {data.income.map((i, idx) => (
-                <div key={idx} className="flex justify-between py-1">
-                  <span>{i.category}</span>
-                  <span className="font-medium">{i.total.toLocaleString()}</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="card p-5">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-income" /> Income
+              </h3>
+              {data.income.length === 0 ? (
+                <p className="text-sm text-gray-400">No income recorded</p>
+              ) : (
+                <div className="space-y-2">
+                  {data.income.map((i, idx) => (
+                    <div key={idx} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                      <span className="text-sm text-gray-700">{i.category}</span>
+                      <span className="font-semibold text-income-dark">${i.total.toLocaleString()}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-            <div className="bg-white rounded-lg border p-4">
-              <h3 className="font-semibold mb-3">Expenses</h3>
-              {data.expenses.map((e, idx) => (
-                <div key={idx} className="flex justify-between py-1">
-                  <span>{e.category}</span>
-                  <span className="font-medium">{e.total.toLocaleString()}</span>
+            <div className="card p-5">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <TrendingDown className="w-4 h-4 text-expense" /> Expenses
+              </h3>
+              {data.expenses.length === 0 ? (
+                <p className="text-sm text-gray-400">No expenses recorded</p>
+              ) : (
+                <div className="space-y-2">
+                  {data.expenses.map((e, idx) => (
+                    <div key={idx} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                      <span className="text-sm text-gray-700">{e.category}</span>
+                      <span className="font-semibold text-expense">${e.total.toLocaleString()}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

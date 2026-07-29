@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { Category } from "@/types";
+import { Plus, Tags } from "lucide-react";
 
 export default function CategoriesPage() {
   const { ready } = useAuthGuard();
@@ -34,52 +35,64 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Categories</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+          <p className="text-sm text-gray-500 mt-1">Organize your income and expense types</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleCreate} className="flex gap-3 mb-8 max-w-md">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Category name"
-          required
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2"
-        />
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-2"
-        >
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          Add
+      <form onSubmit={handleCreate} className="card p-5 mb-8 max-w-lg flex items-end gap-3">
+        <div className="flex-1">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Office Supplies"
+            required
+            className="input-field"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Type</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="input-field"
+          >
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <button type="submit" className="btn-primary inline-flex items-center gap-1.5 shrink-0">
+          <Plus className="w-4 h-4" /> Add
         </button>
       </form>
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       {categories.length === 0 ? (
-        <p className="text-gray-400">No categories yet. Create one above.</p>
+        <div className="card"><div className="empty-state">No categories yet. Create one above.</div></div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden max-w-md">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left px-4 py-3">Name</th>
-                <th className="text-left px-4 py-3">Type</th>
+        <div className="card overflow-hidden max-w-lg">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="table-header px-6 py-4">Name</th>
+                <th className="table-header px-6 py-4">Type</th>
               </tr>
             </thead>
-            <tbody>
-              {categories.map((c) => (
-                <tr key={c.id} className="border-t">
-                  <td className="px-4 py-3">{c.name}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${c.type === "expense" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+            <tbody className="divide-y divide-gray-100">
+              {categories.map((c, i) => (
+                <tr key={c.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-primary-50/30 transition-colors`}>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
+                  <td className="px-6 py-4">
+                    <span className={c.type === "expense" ? "badge-expense" : "badge-income"}>
                       {c.type}
                     </span>
                   </td>

@@ -1,37 +1,59 @@
 import Link from "next/link";
+import { Scale, ChartPie, FileSpreadsheet, ArrowRight } from "lucide-react";
+
+const reports = [
+  {
+    href: "/reports/trial-balance",
+    title: "Trial Balance",
+    desc: "Category totals grouped by type",
+    icon: Scale,
+    color: "text-blue-600 bg-blue-50",
+  },
+  {
+    href: "/reports/profit-loss",
+    title: "Profit & Loss",
+    desc: "Income, expenses, and net profit for a period",
+    icon: ChartPie,
+    color: "text-green-600 bg-green-50",
+  },
+  {
+    href: "/reports/balance-sheet",
+    title: "Balance Sheet",
+    desc: "Assets, liabilities, and equity as of a date",
+    icon: FileSpreadsheet,
+    color: "text-purple-600 bg-purple-50",
+  },
+];
 
 export default function ReportsPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Reports</h1>
-      <div className="grid grid-cols-3 gap-4">
-        <Link
-          href="/reports/trial-balance"
-          className="bg-white p-6 rounded-lg border hover:shadow-md transition-shadow"
-        >
-          <h2 className="font-semibold text-lg">Trial Balance</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Category totals grouped by type
-          </p>
-        </Link>
-        <Link
-          href="/reports/profit-loss"
-          className="bg-white p-6 rounded-lg border hover:shadow-md transition-shadow"
-        >
-          <h2 className="font-semibold text-lg">Profit & Loss</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Income, expenses, and net profit for a period
-          </p>
-        </Link>
-        <Link
-          href="/reports/balance-sheet"
-          className="bg-white p-6 rounded-lg border hover:shadow-md transition-shadow"
-        >
-          <h2 className="font-semibold text-lg">Balance Sheet</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Assets, liabilities, and equity as of a date
-          </p>
-        </Link>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+        <p className="text-sm text-gray-500 mt-1">Financial statements and summaries</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {reports.map((r) => {
+          const Icon = r.icon;
+          return (
+            <Link
+              key={r.href}
+              href={r.href}
+              className="card-hover group p-6 block"
+            >
+              <div className={`w-12 h-12 rounded-lg ${r.color} flex items-center justify-center mb-4`}>
+                <Icon className="w-6 h-6" />
+              </div>
+              <h2 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
+                {r.title}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1.5">{r.desc}</p>
+              <div className="flex items-center gap-1 mt-4 text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                View report <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

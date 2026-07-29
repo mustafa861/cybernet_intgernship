@@ -40,7 +40,10 @@ export default function EditEntryPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Edit Entry</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Edit Entry</h1>
+        <p className="text-sm text-gray-500 mt-1">Update this transaction record</p>
+      </div>
       <EntryForm
         categories={categories}
         onSubmit={handleSubmit}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { ConversationSummary } from "@/types";
+import { MessageSquare, Plus, Trash2, History } from "lucide-react";
 
 interface Props {
   activeId: string | null;
@@ -23,21 +24,27 @@ export function ChatHistory({ activeId, onNew, onSelect, refreshKey }: Props) {
     try {
       await api.deleteConversation(id);
       setConversations((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      // silently fail
-    }
+    } catch {}
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 border-r border-gray-200 p-3">
-      <button
-        onClick={onNew}
-        className="w-full mb-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 text-sm font-medium"
-      >
-        + New Chat
-      </button>
+    <div className="flex flex-col h-full bg-white border-r border-gray-200">
+      <div className="p-4 border-b border-gray-100">
+        <button
+          onClick={onNew}
+          className="w-full btn-primary inline-flex items-center justify-center gap-2"
+        >
+          <Plus className="w-4 h-4" /> New Chat
+        </button>
+      </div>
 
-      <div className="flex-1 overflow-y-auto space-y-1">
+      <div className="p-3 border-b border-gray-100">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+          <History className="w-3.5 h-3.5" /> History
+        </p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {conversations.length === 0 && (
           <p className="text-gray-400 text-sm text-center mt-8">No conversations yet</p>
         )}
@@ -45,20 +52,19 @@ export function ChatHistory({ activeId, onNew, onSelect, refreshKey }: Props) {
           <div
             key={c.id}
             onClick={() => onSelect(c)}
-            className={`group flex items-center justify-between px-3 py-2 rounded-md cursor-pointer text-sm ${
+            className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer text-sm transition-colors ${
               activeId === c.id
-                ? "bg-blue-100 text-blue-800"
-                : "hover:bg-gray-100 text-gray-800"
+                ? "bg-primary-50 text-primary-700"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
+            <MessageSquare className={`w-4 h-4 shrink-0 ${activeId === c.id ? "text-primary-500" : "text-gray-400"}`} />
             <span className="truncate flex-1">{c.title}</span>
             <button
               onClick={(e) => handleDelete(c.id, e)}
-              className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 ml-2"
+              className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}

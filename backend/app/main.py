@@ -12,7 +12,10 @@ from app.routers import auth, categories, chat, conversations, entries, reports
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"[startup] Table creation skipped: {e}")
     yield
 
 

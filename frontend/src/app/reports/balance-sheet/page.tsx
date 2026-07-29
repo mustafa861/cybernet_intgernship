@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { BalanceSheetResponse } from "@/types";
+import { Search, Building2, CreditCard, Landmark } from "lucide-react";
 
 export default function BalanceSheetPage() {
   const { ready } = useAuthGuard();
@@ -23,51 +24,69 @@ export default function BalanceSheetPage() {
     setLoading(false);
   };
 
+  const sectionIcons: Record<string, typeof Building2> = {
+    Assets: Building2, Liabilities: CreditCard, Equity: Landmark,
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Balance Sheet</h1>
-      <form onSubmit={fetchReport} className="flex gap-3 mb-6">
-        <input
-          type="date"
-          value={asOf}
-          onChange={(e) => setAsOf(e.target.value)}
-          required
-          className="border rounded-md px-3 py-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? "Loading..." : "Generate"}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Balance Sheet</h1>
+        <p className="text-sm text-gray-500 mt-1">Assets, liabilities, and equity as of a date</p>
+      </div>
+
+      <form onSubmit={fetchReport} className="card p-5 mb-8 flex flex-wrap items-end gap-3">
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">As of Date</label>
+          <input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} required className="input-field" />
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary inline-flex items-center gap-2">
+          <Search className="w-4 h-4" /> {loading ? "Loading..." : "Generate"}
         </button>
       </form>
+
       {data && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Assets</p>
-              <p className="text-xl font-bold text-blue-600">{data.total_assets.toLocaleString()}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="stat-card">
+              <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                <Building2 className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Assets</p>
+                <p className="text-2xl font-bold text-blue-700 mt-0.5">${data.total_assets.toLocaleString()}</p>
+              </div>
             </div>
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Liabilities & Equity</p>
-              <p className="text-xl font-bold text-blue-600">{data.total_liabilities_and_equity.toLocaleString()}</p>
+            <div className="stat-card">
+              <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                <Landmark className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Liabilities & Equity</p>
+                <p className="text-2xl font-bold text-purple-700 mt-0.5">${data.total_liabilities_and_equity.toLocaleString()}</p>
+              </div>
             </div>
           </div>
+
           {[
             { label: "Assets", items: data.assets },
             { label: "Liabilities", items: data.liabilities },
             { label: "Equity", items: data.equity },
           ].map((section) =>
             section.items.length > 0 ? (
-              <div key={section.label} className="bg-white rounded-lg border p-4">
-                <h3 className="font-semibold mb-3">{section.label}</h3>
-                {section.items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between py-1">
-                    <span>{item.category}</span>
-                    <span className="font-medium">{item.total.toLocaleString()}</span>
-                  </div>
-                ))}
+              <div key={section.label} className="card p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  {(() => { const Icon = sectionIcons[section.label] || Building2; return <Icon className="w-4 h-4 text-primary-600" />; })()}
+                  {section.label}
+                </h3>
+                <div className="space-y-2">
+                  {section.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
+                      <span className="text-sm text-gray-700">{item.category}</span>
+                      <span className="font-semibold text-gray-900">${item.total.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null
           )}

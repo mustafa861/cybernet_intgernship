@@ -47,72 +47,99 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
   });
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Type</label>
-        <select
-          value={entryType}
-          onChange={(e) => setEntryType(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        >
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
+    <form onSubmit={handleSubmit} className="card p-6 max-w-lg space-y-5">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+          <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setEntryType("expense")}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                entryType === "expense"
+                  ? "bg-expense text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Expense
+            </button>
+            <button
+              type="button"
+              onClick={() => setEntryType("income")}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                entryType === "income"
+                  ? "bg-income text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Income
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              className="input-field pl-7"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
       </div>
+
       <div>
-        <label className="block text-sm font-medium text-gray-700">Category</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+          className="input-field"
         >
-          <option value="">Select category</option>
+          <option value="">Select a category</option>
           {filtered.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Amount</label>
-        <input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <input
+            type="date"
+            value={entryDate}
+            onChange={(e) => setEntryDate(e.target.value)}
+            required
+            className="input-field"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="input-field"
+            placeholder="Optional note"
+          />
+        </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Date</label>
-        <input
-          type="date"
-          value={entryDate}
-          onChange={(e) => setEntryDate(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
+
+      <div className="flex gap-3 pt-2">
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading ? "Saving..." : "Save Entry"}
+        </button>
+        <button type="button" onClick={() => window.history.back()} className="btn-secondary">
+          Cancel
+        </button>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-      >
-        {loading ? "Saving..." : "Save Entry"}
-      </button>
     </form>
   );
 }

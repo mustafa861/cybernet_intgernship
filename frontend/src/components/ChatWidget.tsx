@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { api } from "@/lib/api";
+import { Send, Bot, User, Loader2 } from "lucide-react";
 
 interface Props {
   conversationId?: string | null;
@@ -42,8 +43,7 @@ export function ChatWidget({ conversationId, onUpdate }: Props) {
     ]);
     setLoading(true);
     api.chatStream(
-      msg,
-      convId,
+      msg, convId,
       (token) => {
         setMessages((prev) => {
           const copy = [...prev];
@@ -55,51 +55,61 @@ export function ChatWidget({ conversationId, onUpdate }: Props) {
         });
       },
       (newConvId) => setConvId(newConvId),
-      () => {
-        setLoading(false);
-        onUpdate?.();
-      },
+      () => { setLoading(false); onUpdate?.(); },
     );
   };
 
   return (
-    <div className="flex flex-col h-[600px] border rounded-lg bg-white">
+    <div className="flex flex-col h-[600px] card overflow-hidden">
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (
-          <p className="text-gray-400 text-sm">
-            Ask me anything about your finances — add an entry, generate a report, run an audit.
-          </p>
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <Bot className="w-12 h-12 text-primary-200 mb-3" />
+            <p className="text-gray-400 text-sm max-w-sm">
+              Ask me anything about your finances &mdash; add an entry, generate a report, run an audit.
+            </p>
+          </div>
         )}
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`p-3 rounded-lg max-w-[80%] whitespace-pre-wrap ${
+          <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+              m.role === "user" ? "bg-primary-100" : "bg-gray-100"
+            }`}>
+              {m.role === "user"
+                ? <User className="w-4 h-4 text-primary-600" />
+                : <Bot className="w-4 h-4 text-gray-500" />
+              }
+            </div>
+            <div className={`rounded-xl px-4 py-2.5 max-w-[75%] whitespace-pre-wrap text-sm leading-relaxed ${
               m.role === "user"
-                ? "bg-blue-600 text-white ml-auto"
-                : "bg-gray-100 text-gray-900"
-            }`}
-          >
-            {m.content}
+                ? "bg-primary-600 text-white rounded-tr-sm"
+                : "bg-gray-100 text-gray-800 rounded-tl-sm"
+            }`}>
+              {m.content || (loading && i === messages.length - 1 ? (
+                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+              ) : null)}
+            </div>
           </div>
         ))}
-        {loading && <div className="text-gray-400 text-sm">Thinking...</div>}
         <div ref={bottomRef} />
       </div>
-      <div className="border-t p-3 flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          placeholder="Type a message..."
-          className="flex-1 border rounded-md px-3 py-2 text-sm"
-        />
-        <button
-          onClick={send}
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 disabled:opacity-50"
-        >
-          Send
-        </button>
+      <div className="border-t border-gray-200 p-3 bg-white">
+        <div className="flex gap-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder="Type your message..."
+            className="input-field flex-1"
+          />
+          <button
+            onClick={send}
+            disabled={loading || !input.trim()}
+            className="btn-primary !px-3 inline-flex items-center justify-center disabled:opacity-40"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
