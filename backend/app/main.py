@@ -32,9 +32,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://caaccountingai-p1.vercel.app",
-        "https://cybernet-internship.vercel.app",
         "http://localhost:3000",
-        "http://localhost:8000",
+        "http://localhost:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
