@@ -38,6 +38,7 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
   const [description, setDescription] = useState(initial?.description || "");
   const [contactName, setContactName] = useState(initial?.contact_name || "");
   const [contactType, setContactType] = useState(initial?.contact_type || "");
+  const [attachmentUrl, setAttachmentUrl] = useState("");
   const [recurring, setRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   const [recurringEndDate, setRecurringEndDate] = useState("");
@@ -52,6 +53,7 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
       description,
       contact_name: contactName || null,
       contact_type: (contactType as "customer" | "vendor" | null) || null,
+      attachment_url: attachmentUrl || null,
       recurring,
       recurring_frequency: recurring ? recurringFrequency : undefined,
       recurring_end_date: recurring ? recurringEndDate || undefined : undefined,
@@ -148,6 +150,17 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
             placeholder="Optional note"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Receipt / Attachment URL (optional)</label>
+        <input
+          type="url"
+          value={attachmentUrl}
+          onChange={(e) => setAttachmentUrl(e.target.value)}
+          className="input-field"
+          placeholder="https://drive.google.com/..."
+        />
       </div>
 
       <details className="group">

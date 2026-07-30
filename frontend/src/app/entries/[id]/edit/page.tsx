@@ -30,6 +30,7 @@ export default function EditEntryPage() {
     amount: number;
     entry_date: string;
     description: string;
+    attachment_url?: string | null;
   }) => {
     setLoading(true);
     await api.updateEntry(params.id as string, data as Partial<EntryCreate>);
@@ -47,15 +48,16 @@ export default function EditEntryPage() {
       <EntryForm
         categories={categories}
         onSubmit={handleSubmit}
-        initial={{
-          entry_type: entry.entry_type,
-          category_id: entry.category_id,
-          amount: entry.amount_minor / 100,
-          entry_date: entry.entry_date,
-          description: entry.description || "",
-          contact_name: entry.contact_name,
-          contact_type: entry.contact_type,
-        }}
+          initial={{
+            entry_type: entry.entry_type,
+            category_id: entry.category_id,
+            amount: entry.amount_minor / 100,
+            entry_date: entry.entry_date,
+            description: entry.description || "",
+            contact_name: entry.contact_name,
+            contact_type: entry.contact_type,
+            attachment_url: entry.attachment_url || "",
+          }}
         loading={loading}
       />
     </div>

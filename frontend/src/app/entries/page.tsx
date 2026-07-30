@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { Entry } from "@/types";
-import { Plus, Pencil, Trash2, ArrowRightLeft, RefreshCw } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowRightLeft, RefreshCw, Paperclip } from "lucide-react";
 
 export default function EntriesPage() {
   const { ready } = useAuthGuard();
@@ -100,7 +100,16 @@ export default function EntriesPage() {
                       ${(e.amount_minor / 100).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{e.entry_date}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{e.description || <span className="text-gray-300 dark:text-gray-600">&mdash;</span>}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1.5">
+                        {e.attachment_url && (
+                          <a href={e.attachment_url} target="_blank" rel="noopener noreferrer" className="shrink-0 text-primary-500 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" title="View attachment">
+                            <Paperclip className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        <span>{e.description || <span className="text-gray-300 dark:text-gray-600">&mdash;</span>}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {e.contact_name ? (
                         <span className="inline-flex items-center gap-1">
