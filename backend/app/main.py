@@ -20,8 +20,9 @@ app.add_middleware(
     allow_origins=[
         "https://caaccountingai-p1.vercel.app",
         "https://cybernet-intgernship.vercel.app",
+        "https://cybernet-intgernship.onrender.com",
     ],
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|.*\.vercel\.app|.*\.onrender\.com)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +44,22 @@ async def validation_exception_handler(
                 "code": "VALIDATION_ERROR",
                 "message": "Request validation failed",
                 "field_errors": field_errors,
+            }
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    import traceback
+    error_detail = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    print(f"UNHANDLED ERROR: {error_detail}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An unexpected error occurred",
             }
         },
     )
