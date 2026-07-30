@@ -16,6 +16,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(Text, unique=True)
     password_hash: Mapped[str] = mapped_column(Text)
     business_name: Mapped[str] = mapped_column(Text)
+    phone: Mapped[str | None] = mapped_column(Text, nullable=True)
+    currency: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

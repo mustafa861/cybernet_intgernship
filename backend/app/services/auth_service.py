@@ -35,7 +35,10 @@ def decode_access_token(token: str) -> str | None:
         return None
 
 
-def register_user(db: Session, email: str, password: str, business_name: str) -> User:
+def register_user(
+    db: Session, email: str, password: str, business_name: str,
+    phone: str, currency: str,
+) -> User:
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         raise ValueError("Email already registered")
@@ -44,6 +47,8 @@ def register_user(db: Session, email: str, password: str, business_name: str) ->
         email=email,
         password_hash=hash_password(password),
         business_name=business_name,
+        phone=phone,
+        currency=currency,
     )
     db.add(user)
     db.commit()

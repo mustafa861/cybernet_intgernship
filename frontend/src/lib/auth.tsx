@@ -7,6 +7,8 @@ import { api } from "./api";
 interface UserInfo {
   email: string;
   business_name: string;
+  phone?: string;
+  currency?: string;
 }
 
 interface AuthContextType {
@@ -15,7 +17,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   hydrated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, business_name: string) => Promise<void>;
+  register: (email: string, password: string, business_name: string, phone?: string, currency?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -51,13 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await api.login(email, password);
     api.setToken(res.access_token);
     setToken(res.access_token);
-    const info: UserInfo = { email: res.email, business_name: res.business_name };
+    const info: UserInfo = { email: res.email, business_name: res.business_name, phone: res.phone, currency: res.currency };
     setUser(info);
     localStorage.setItem("user_info", JSON.stringify(info));
   };
 
-  const register = async (email: string, password: string, business_name: string) => {
-    const res = await api.register(email, password, business_name);
+  const register = async (email: string, password: string, business_name: string, phone?: string, currency?: string) => {
+    await api.register(email, password, business_name, phone, currency);
     await login(email, password);
   };
 

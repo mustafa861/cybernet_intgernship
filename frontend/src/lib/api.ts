@@ -48,16 +48,16 @@ class ApiClient {
   }
 
   // Auth
-  register(email: string, password: string, business_name: string) {
-    return this.request<{ user_id: string; email: string; business_name: string }>(
+  register(email: string, password: string, business_name: string, phone?: string, currency?: string) {
+    return this.request<{ user_id: string; email: string; business_name: string; phone?: string; currency?: string }>(
       "POST",
       "/auth/register",
-      { email, password, business_name }
+      { email, password, business_name, phone, currency }
     );
   }
 
   login(email: string, password: string) {
-    return this.request<{ access_token: string; token_type: string; email: string; business_name: string }>(
+    return this.request<{ access_token: string; token_type: string; email: string; business_name: string; phone?: string; currency?: string }>(
       "POST",
       "/auth/login",
       { email, password }

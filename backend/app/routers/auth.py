@@ -21,9 +21,12 @@ async def register(body: UserRegisterRequest, db: Session = Depends(get_db)):
             email=body.email,
             password=body.password,
             business_name=body.business_name,
+            phone=body.phone,
+            currency=body.currency,
         )
         return UserResponse(
-            user_id=user.id, email=user.email, business_name=user.business_name
+            user_id=user.id, email=user.email, business_name=user.business_name,
+            phone=user.phone, currency=user.currency,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
@@ -38,4 +41,8 @@ async def login(body: LoginRequest, db: Session = Depends(get_db)):
             detail="Invalid email or password",
         )
     token = create_access_token(str(user.id))
-    return LoginResponse(access_token=token, token_type="bearer", email=user.email, business_name=user.business_name)
+    return LoginResponse(
+        access_token=token, token_type="bearer",
+        email=user.email, business_name=user.business_name,
+        phone=user.phone, currency=user.currency,
+    )

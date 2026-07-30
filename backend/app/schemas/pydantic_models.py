@@ -18,12 +18,16 @@ class UserRegisterRequest(BaseModel):
     email: str
     password: str
     business_name: str
+    phone: str
+    currency: str = "PKR"
 
 
 class UserResponse(BaseModel):
     user_id: uuid.UUID
     email: str
     business_name: str
+    phone: str | None = None
+    currency: str | None = None
 
 
 class LoginRequest(BaseModel):
@@ -36,6 +40,8 @@ class LoginResponse(BaseModel):
     token_type: str = "bearer"
     email: str
     business_name: str
+    phone: str | None = None
+    currency: str | None = None
 
 
 class CategoryResponse(BaseModel):
