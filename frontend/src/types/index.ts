@@ -29,6 +29,7 @@ export interface Entry {
   source: "manual" | "ai_agent";
   contact_name: string | null;
   contact_type: "customer" | "vendor" | null;
+  attachment_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +43,7 @@ export interface EntryCreate {
   source?: "manual" | "ai_agent";
   contact_name?: string | null;
   contact_type?: "customer" | "vendor" | null;
+  attachment_url?: string | null;
 }
 
 export interface TrialBalanceItem {
