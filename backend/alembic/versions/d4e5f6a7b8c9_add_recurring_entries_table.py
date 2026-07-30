@@ -18,24 +18,21 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table(
-        'recurring_entries',
-        sa.Column('id', sa.Uuid(), nullable=False),
-        sa.Column('user_id', sa.Uuid(), nullable=False),
-        sa.Column('category_id', sa.Uuid(), nullable=False),
-        sa.Column('entry_type', sa.Enum('expense', 'income', name='entry_type'), nullable=False),
-        sa.Column('amount_minor', sa.BigInteger(), nullable=False),
-        sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('frequency', sa.Enum('weekly', 'monthly', name='recurring_frequency'), nullable=False),
-        sa.Column('end_date', sa.Date(), nullable=True),
-        sa.Column('next_run_date', sa.Date(), nullable=False),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id'),
-    )
+    op.execute("""
+        CREATE TABLE recurring_entries (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id UUID NOT NULL REFERENCES users(id),
+            category_id UUID NOT NULL REFERENCES categories(id),
+            entry_type TEXT NOT NULL,
+            amount_minor BIGINT NOT NULL,
+            description TEXT,
+            frequency TEXT NOT NULL,
+            end_date DATE,
+            next_run_date DATE NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+    """)
 
 
 def downgrade() -> None:
-    op.drop_table('recurring_entries')
-    op.execute('DROP TYPE IF EXISTS recurring_frequency')
+    op.execute('DROP TABLE IF EXISTS recurring_entries CASCADE')
