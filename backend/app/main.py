@@ -5,11 +5,18 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+from app.config import Settings
 from app.routers import auth, categories, chat, conversations, entries, recurring_entries, reports
+
+settings = Settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    db_url = settings.database_url
+    masked = db_url.split("@")[-1] if "@" in db_url else "not set"
+    print(f"STARTUP: DATABASE_URL -> ...@{masked}")
+    print(f"STARTUP: JWT_SECRET set? {'yes' if settings.jwt_secret and settings.jwt_secret != 'change-me-in-production' else 'using default'}")
     yield
 
 
