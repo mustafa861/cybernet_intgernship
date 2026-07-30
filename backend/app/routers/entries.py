@@ -126,6 +126,8 @@ async def update_entry(
         entry.contact_name = body.contact_name
     if body.contact_type is not None:
         entry.contact_type = body.contact_type
+    if body.attachment_url is not None:
+        entry.attachment_url = body.attachment_url
     db.commit()
     db.refresh(entry)
     return _entry_to_response(entry)
