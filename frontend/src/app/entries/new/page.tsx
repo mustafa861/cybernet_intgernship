@@ -26,6 +26,7 @@ export default function NewEntryPage() {
     description: string;
     contact_name?: string | null;
     contact_type?: string | null;
+    attachment_url?: string | null;
     recurring?: boolean;
     recurring_frequency?: string;
     recurring_end_date?: string;
