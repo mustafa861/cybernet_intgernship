@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
 
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +19,12 @@ async def lifespan(app: FastAPI):
     masked = db_url.split("@")[-1] if "@" in db_url else "not set"
     print(f"STARTUP: DATABASE_URL -> ...@{masked}")
     print(f"STARTUP: JWT_SECRET set? {'yes' if settings.jwt_secret and settings.jwt_secret != 'change-me-in-production' else 'using default'}")
+    try:
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        print("MIGRATIONS: ran successfully")
+    except Exception as e:
+        print(f"MIGRATIONS: failed — {e}")
     yield
 
 
