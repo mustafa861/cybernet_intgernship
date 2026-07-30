@@ -14,6 +14,7 @@ interface Props {
     description: string;
     contact_name?: string | null;
     contact_type?: string | null;
+    attachment_url?: string | null;
     recurring?: boolean;
     recurring_frequency?: string;
     recurring_end_date?: string;
@@ -26,6 +27,7 @@ interface Props {
     description: string;
     contact_name?: string | null;
     contact_type?: string | null;
+    attachment_url?: string;
   };
   loading?: boolean;
 }
@@ -38,7 +40,7 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
   const [description, setDescription] = useState(initial?.description || "");
   const [contactName, setContactName] = useState(initial?.contact_name || "");
   const [contactType, setContactType] = useState(initial?.contact_type || "");
-  const [attachmentUrl, setAttachmentUrl] = useState("");
+  const [attachmentUrl, setAttachmentUrl] = useState(initial?.attachment_url || "");
   const [recurring, setRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   const [recurringEndDate, setRecurringEndDate] = useState("");
