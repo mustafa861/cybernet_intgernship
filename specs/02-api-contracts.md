@@ -36,7 +36,9 @@ Request:
   amount: float,          # human-readable, converted to amount_minor server-side
   entry_date: date,
   description: str | null,
-  source: "manual" | "ai_agent"   # defaults to "manual" if omitted
+  source: "manual" | "ai_agent",   # defaults to "manual" if omitted
+  contact_name: str | null,        # customer or vendor name for AR/AP
+  contact_type: "customer" | "vendor" | null
 }
 ```
 Response: the created entry, including generated `id`.
@@ -81,6 +83,19 @@ Response:
   total_liabilities_and_equity: float
 }
 ```
+
+### `GET /api/reports/ageing`
+Response:
+```
+{
+  as_of: date,
+  customers: [{ contact_name: str, total: float, current: float, days_31_60: float, days_60_plus: float }],
+  vendors: [{ contact_name: str, total: float, current: float, days_31_60: float, days_60_plus: float }],
+  total_receivables: float,
+  total_payables: float
+}
+```
+Buckets: 0-30 days overdue = current, 31-60 days, 60+ days.
 
 ### `POST /api/reports/monthly-audit`
 Request: `{ month: date }` (any date within the target month)

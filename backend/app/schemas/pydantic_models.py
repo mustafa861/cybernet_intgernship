@@ -61,6 +61,8 @@ class EntryCreateRequest(BaseModel):
     entry_date: date
     description: str | None = None
     source: str = Field(default="manual", pattern=r"^(manual|ai_agent)$")
+    contact_name: str | None = None
+    contact_type: str | None = Field(default=None, pattern=r"^(customer|vendor)$")
 
 
 class EntryUpdateRequest(BaseModel):
@@ -69,6 +71,8 @@ class EntryUpdateRequest(BaseModel):
     amount: float | None = Field(default=None, gt=0, lt=1_000_000_000)
     entry_date: date | None = None
     description: str | None = None
+    contact_name: str | None = None
+    contact_type: str | None = Field(default=None, pattern=r"^(customer|vendor)$")
 
 
 class EntryResponse(BaseModel):
@@ -81,6 +85,8 @@ class EntryResponse(BaseModel):
     entry_date: date
     description: str | None
     source: str
+    contact_name: str | None = None
+    contact_type: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -171,6 +177,22 @@ class ActionTaken(BaseModel):
     tool: str
     input: dict
     result_summary: str
+
+
+class AgeingItem(BaseModel):
+    contact_name: str
+    total: float
+    current: float
+    days_31_60: float
+    days_60_plus: float
+
+
+class AgeingResponse(BaseModel):
+    as_of: date
+    customers: list[AgeingItem]
+    vendors: list[AgeingItem]
+    total_receivables: float
+    total_payables: float
 
 
 class ChatResponse(BaseModel):

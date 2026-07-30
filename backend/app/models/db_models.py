@@ -81,6 +81,10 @@ class Entry(Base):
     source: Mapped[str] = mapped_column(
         Enum("manual", "ai_agent", name="entry_source"),
     )
+    contact_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    contact_type: Mapped[str | None] = mapped_column(
+        Enum("customer", "vendor", name="contact_type"), nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

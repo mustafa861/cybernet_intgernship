@@ -46,6 +46,8 @@ The core ledger table. Every expense, income, or manual journal line is a row he
 | entry_date | DATE | the date the transaction occurred |
 | description | TEXT, nullable | |
 | source | ENUM('manual','ai_agent') | how the entry was created |
+| contact_name | TEXT, nullable | customer or vendor name for AR/AP tracking |
+| contact_type | ENUM('customer','vendor'), nullable | identifies if entry is AR (customer) or AP (vendor) |
 | created_at | TIMESTAMPTZ | default now() |
 | updated_at | TIMESTAMPTZ | default now(), updated on edit |
 
