@@ -35,6 +35,7 @@ def create_entry(
     source: str,
     description: str | None = None,
     currency: str = "PKR",
+    attachment_url: str | None = None,
 ) -> Entry:
     entry = Entry(
         id=uuid.uuid4(),
@@ -46,6 +47,7 @@ def create_entry(
         entry_date=entry_date,
         description=description,
         source=source,
+        attachment_url=attachment_url,
     )
     db.add(entry)
     db.commit()
