@@ -88,6 +88,7 @@ class ApiClient {
     entry_date: string;
     description?: string | null;
     source?: string;
+    attachment_url?: string | null;
   }) {
     return this.request<EntryResponse>("POST", "/entries", data);
   }
