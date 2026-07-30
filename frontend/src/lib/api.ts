@@ -66,17 +66,17 @@ class ApiClient {
 
   // Categories
   listCategories() {
-    return this.request<{ id: string; name: string; type: string }[]>(
+    return this.request<Category[]>(
       "GET",
       "/categories"
     );
   }
 
-  createCategory(name: string, type: string) {
-    return this.request<{ id: string; name: string; type: string }>(
+  createCategory(name: string, type: string, parent_id?: string) {
+    return this.request<Category>(
       "POST",
       "/categories",
-      { name, type }
+      { name, type, parent_id }
     );
   }
 
@@ -214,6 +214,7 @@ class ApiClient {
 export const api = new ApiClient();
 
 type EntryResponse = import("../types").Entry;
+type Category = import("../types").Category;
 type ProfitLossResponse = import("../types").ProfitLossResponse;
 type BalanceSheetResponse = import("../types").BalanceSheetResponse;
 type MonthlyAuditResponse = import("../types").MonthlyAuditResponse;

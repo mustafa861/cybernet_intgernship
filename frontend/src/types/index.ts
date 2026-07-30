@@ -13,6 +13,8 @@ export interface Category {
   id: string;
   name: string;
   type: string;
+  parent_id: string | null;
+  children: Category[];
 }
 
 export interface Entry {
