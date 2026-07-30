@@ -334,6 +334,80 @@ class ListCategoriesTool(Tool):
         return "Categories:\n" + "\n".join(lines)
 
 
+class ForecastCashFlowTool(Tool):
+    def __init__(self):
+        class Params(BaseModel):
+            months_ahead: int = Field(default=1, ge=1, le=3)
+
+        super().__init__(
+            name="forecast_cash_flow",
+            description="Project future cash flow based on the last 3 months of actual data. Clearly labelled as an estimate.",
+            params_schema=Params,
+        )
+
+    def execute(self, db: Session, user_id: str, **kwargs) -> str:
+        params = self.params_schema(**kwargs)
+        from datetime import timedelta
+        today = date.today()
+        three_months_ago = today.replace(day=1)
+        for _ in range(3):
+            month = three_months_ago.month - 1
+            year = three_months_ago.year
+            if month < 1:
+                month = 12
+                year -= 1
+            three_months_ago = three_months_ago.replace(year=year, month=month)
+
+        entries = list_entries(
+            db=db, user_id=user_id,
+            start_date=three_months_ago, end_date=today,
+        )
+
+        if not entries:
+            return "Not enough historical data to generate a forecast (need at least some entries in the last 3 months)."
+
+        months_data: dict[str, dict] = {}
+        for e in entries:
+            month_key = e.entry_date.strftime("%Y-%m")
+            if month_key not in months_data:
+                months_data[month_key] = {"income": 0, "expense": 0}
+            if e.entry_type == "income":
+                months_data[month_key]["income"] += e.amount_minor
+            else:
+                months_data[month_key]["expense"] += e.amount_minor
+
+        num_months = len(months_data)
+        if num_months == 0:
+            return "Not enough historical data to generate a forecast."
+
+        total_income = sum(m["income"] for m in months_data.values())
+        total_expense = sum(m["expense"] for m in months_data.values())
+        avg_income = total_income / num_months
+        avg_expense = total_expense / num_months
+        avg_net = (avg_income - avg_expense) / 100
+
+        lines = [
+            f"⚠️ Cash Flow Forecast (estimated based on last {num_months} month(s))",
+            f"Average monthly income: ${avg_income / 100:.2f}",
+            f"Average monthly expenses: ${avg_expense / 100:.2f}",
+            f"Average monthly net: ${avg_net:.2f}",
+        ]
+        for i in range(1, params.months_ahead + 1):
+            projected_month = today.replace(day=1)
+            for _ in range(i):
+                m = projected_month.month + 1
+                y = projected_month.year
+                if m > 12:
+                    m = 1
+                    y += 1
+                projected_month = projected_month.replace(year=y, month=m)
+            pnl = avg_net * i
+            lines.append(f"Projected net for {projected_month.strftime('%B %Y')}: ${pnl:.2f} (cumulative)")
+        lines.append("")
+        lines.append("Disclaimer: This is a simplified estimate based on historical averages. Actual results will vary.")
+        return "\n".join(lines)
+
+
 _REGISTRY: list[Tool] = [
     CreateEntryTool(),
     UpdateEntryTool(),
@@ -346,6 +420,7 @@ _REGISTRY: list[Tool] = [
     GenerateTrialBalanceTool(),
     RunMonthlyAuditTool(),
     SummarizeSpendingTool(),
+    ForecastCashFlowTool(),
 ]
 
 
@@ -585,6 +660,12 @@ def _mock_llm(system: str, messages: list) -> str:
         calls.append({
             "tool": "update_entry",
             "arguments": {"entry_id": "ASK_USER_FOR_ID", "amount": 0.0},
+        })
+
+    if not calls and ("forecast" in lower or "project" in lower or "predict" in lower or "future" in lower or "next month" in lower or "next" in lower):
+        calls.append({
+            "tool": "forecast_cash_flow",
+            "arguments": {"months_ahead": 3 if "3" in lower or "three" in lower else 1},
         })
 
     if not calls and ("list category" in lower or "show category" in lower or "categories" in lower or "category dikha" in lower):

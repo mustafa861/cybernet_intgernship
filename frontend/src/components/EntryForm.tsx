@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Category } from "@/types";
+import { Repeat } from "lucide-react";
 
 interface Props {
   categories: Category[];
@@ -13,6 +14,9 @@ interface Props {
     description: string;
     contact_name?: string | null;
     contact_type?: string | null;
+    recurring?: boolean;
+    recurring_frequency?: string;
+    recurring_end_date?: string;
   }) => Promise<void>;
   initial?: {
     entry_type: string;
@@ -34,6 +38,9 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
   const [description, setDescription] = useState(initial?.description || "");
   const [contactName, setContactName] = useState(initial?.contact_name || "");
   const [contactType, setContactType] = useState(initial?.contact_type || "");
+  const [recurring, setRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState("monthly");
+  const [recurringEndDate, setRecurringEndDate] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +52,9 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
       description,
       contact_name: contactName || null,
       contact_type: (contactType as "customer" | "vendor" | null) || null,
+      recurring,
+      recurring_frequency: recurring ? recurringFrequency : undefined,
+      recurring_end_date: recurring ? recurringEndDate || undefined : undefined,
     });
   };
 
@@ -169,6 +179,46 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
           </div>
         </div>
       </details>
+
+      {!initial && (
+        <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={recurring}
+              onChange={(e) => setRecurring(e.target.checked)}
+              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+              <Repeat className="w-4 h-4" /> Make this recurring
+            </span>
+          </label>
+          {recurring && (
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Frequency</label>
+                <select
+                  value={recurringFrequency}
+                  onChange={(e) => setRecurringFrequency(e.target.value)}
+                  className="input-field"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">End Date (optional)</label>
+                <input
+                  type="date"
+                  value={recurringEndDate}
+                  onChange={(e) => setRecurringEndDate(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-3 pt-2">
         <button type="submit" disabled={loading} className="btn-primary">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Scale, ChartPie, FileSpreadsheet, Clock, ArrowRight } from "lucide-react";
+import { Scale, ChartPie, FileSpreadsheet, Clock, ArrowRight, DollarSign } from "lucide-react";
 
 const reports = [
   {
@@ -29,6 +29,13 @@ const reports = [
     desc: "AR/AP overdue buckets by customer and vendor",
     icon: Clock,
     color: "text-orange-600 bg-orange-50 dark:bg-orange-900/20",
+  },
+  {
+    href: "/reports/cash-flow",
+    title: "Cash Flow Statement",
+    desc: "Operating cash inflows and outflows for a period",
+    icon: DollarSign,
+    color: "text-teal-600 bg-teal-50 dark:bg-teal-900/20",
   },
 ];
 

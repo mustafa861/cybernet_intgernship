@@ -5,12 +5,14 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { Entry } from "@/types";
-import { Plus, Pencil, Trash2, ArrowRightLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowRightLeft, RefreshCw } from "lucide-react";
 
 export default function EntriesPage() {
   const { ready } = useAuthGuard();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [processMsg, setProcessMsg] = useState("");
 
   useEffect(() => {
     if (!ready) return;
@@ -32,10 +34,40 @@ export default function EntriesPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Entries</h1>
           <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Manage your income and expense records</p>
         </div>
-        <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto">
-          <Plus className="w-4 h-4" /> New Entry
-        </Link>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2">
+            <Plus className="w-4 h-4" /> New Entry
+          </Link>
+          <button
+            onClick={async () => {
+              setProcessing(true);
+              setProcessMsg("");
+              try {
+                const res = await api.processRecurringEntries();
+                if (res.entries_created > 0) {
+                  setProcessMsg(`Created ${res.entries_created} recurring entry/entries`);
+                  setEntries(await api.listEntries());
+                } else {
+                  setProcessMsg("No recurring entries due");
+                }
+              } catch {}
+              setProcessing(false);
+            }}
+            disabled={processing}
+            className="btn-secondary inline-flex items-center gap-1.5 text-sm"
+            title="Process due recurring entries"
+          >
+            <RefreshCw className={`w-4 h-4 ${processing ? "animate-spin" : ""}`} />
+            Recurring
+          </button>
+        </div>
       </div>
+
+      {processMsg && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400">
+          {processMsg}
+        </div>
+      )}
 
       {loading ? (
         <div className="card"><div className="empty-state">Loading...</div></div>

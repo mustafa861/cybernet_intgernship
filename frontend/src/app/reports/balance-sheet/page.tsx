@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { BalanceSheetResponse } from "@/types";
 import { Search, Building2, CreditCard, Landmark } from "lucide-react";
+import { ExportButtons } from "@/components/ExportButtons";
 
 export default function BalanceSheetPage() {
   const { ready } = useAuthGuard();
@@ -30,9 +31,27 @@ export default function BalanceSheetPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Balance Sheet</h1>
-        <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Assets, liabilities, and equity as of a date</p>
+      <div className="flex items-center justify-between gap-3 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Balance Sheet</h1>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Assets, liabilities, and equity as of a date</p>
+        </div>
+        {data && (
+          <ExportButtons
+            filename="balance-sheet"
+            title="Balance Sheet"
+            columns={[
+              { header: "Category", key: "category" },
+              { header: "Section", key: "section" },
+              { header: "Total", key: "total" },
+            ]}
+            rows={[
+              ...data.assets.map((a) => ({ category: a.category, section: "Assets", total: `$${a.total.toLocaleString()}` })),
+              ...data.liabilities.map((l) => ({ category: l.category, section: "Liabilities", total: `$${l.total.toLocaleString()}` })),
+              ...data.equity.map((e) => ({ category: e.category, section: "Equity", total: `$${e.total.toLocaleString()}` })),
+            ]}
+          />
+        )}
       </div>
 
       <form onSubmit={fetchReport} className="card p-5 mb-8 flex flex-wrap items-end gap-3">

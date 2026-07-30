@@ -8,6 +8,7 @@ from app.schemas.pydantic_models import (
     AgeingItem,
     AgeingResponse,
     BalanceSheetResponse,
+    CashFlowResponse,
     CategoryTotal,
     MonthlyAuditRequest,
     MonthlyAuditResponse,
@@ -72,6 +73,29 @@ async def balance_sheet(
         equity=[CategoryTotal(**e) for e in result["equity"]],
         total_assets=result["total_assets"],
         total_liabilities_and_equity=result["total_liabilities_and_equity"],
+    )
+
+
+@router.get("/cash-flow", response_model=CashFlowResponse)
+async def cash_flow(
+    start_date: str = Query(),
+    end_date: str = Query(),
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user),
+):
+    try:
+        sd = date.fromisoformat(start_date)
+        ed = date.fromisoformat(end_date)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format")
+    result = report_service.cash_flow(db=db, user_id=user_id, start_date=sd, end_date=ed)
+    return CashFlowResponse(
+        period=PeriodRange(start_date=sd, end_date=ed),
+        operating_inflow=[CategoryTotal(**i) for i in result["operating_inflow"]],
+        operating_outflow=[CategoryTotal(**o) for o in result["operating_outflow"]],
+        total_operating_inflow=result["total_operating_inflow"],
+        total_operating_outflow=result["total_operating_outflow"],
+        net_cash_flow=result["net_cash_flow"],
     )
 
 

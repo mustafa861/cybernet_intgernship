@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from app.routers import auth, categories, chat, conversations, entries, reports
+from app.routers import auth, categories, chat, conversations, entries, recurring_entries, reports
 
 
 @asynccontextmanager
@@ -54,3 +54,4 @@ app.include_router(entries.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(conversations.router, prefix="/api")
+app.include_router(recurring_entries.router, prefix="/api")

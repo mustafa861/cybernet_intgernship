@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { Entry, Category } from "@/types";
-import { TrendingUp, TrendingDown, PiggyBank, Plus, Bot, Percent, Scale, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, PiggyBank, Plus, Bot, Percent, Scale, BarChart3, Sparkles } from "lucide-react";
 
 interface MonthData {
   label: string;
@@ -59,6 +59,29 @@ export default function DashboardPage() {
 
   const currentRatio = totalLiabilities > 0 ? (totalAssets / totalLiabilities) : 0;
   const netProfitMargin = totalIncome > 0 ? (net / totalIncome) * 100 : 0;
+
+  const forecast = useMemo(() => {
+    if (entries.length === 0) return null;
+    const now = new Date();
+    const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+    const recent = entries.filter((e) => new Date(e.entry_date) >= threeMonthsAgo);
+    if (recent.length === 0) return null;
+    const monthsMap: Record<string, { income: number; expense: number }> = {};
+    for (const e of recent) {
+      const key = e.entry_date.slice(0, 7);
+      if (!monthsMap[key]) monthsMap[key] = { income: 0, expense: 0 };
+      if (e.entry_type === "income") monthsMap[key].income += e.amount_minor;
+      else monthsMap[key].expense += e.amount_minor;
+    }
+    const numMonths = Object.keys(monthsMap).length;
+    if (numMonths === 0) return null;
+    const totalIn = Object.values(monthsMap).reduce((s, m) => s + m.income, 0);
+    const totalOut = Object.values(monthsMap).reduce((s, m) => s + m.expense, 0);
+    const avgIn = totalIn / numMonths / 100;
+    const avgOut = totalOut / numMonths / 100;
+    const avgNet = avgIn - avgOut;
+    return { avgIn, avgOut, avgNet, numMonths };
+  }, [entries]);
 
   const monthlyData = useMemo(() => {
     const groups: Record<string, MonthData> = {};
@@ -211,6 +234,37 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {forecast && (
+          <div className="card p-5">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              Cash Flow Forecast
+            </h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+              Based on average of last {forecast.numMonths} month(s) — estimate only
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500 dark:text-gray-400">Avg. Monthly Income</span>
+                <span className="font-semibold text-income-dark dark:text-green-400">${forecast.avgIn.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 dark:text-gray-400">Avg. Monthly Expenses</span>
+                <span className="font-semibold text-expense dark:text-red-400">${forecast.avgOut.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
+                <span className="text-gray-500 dark:text-gray-400">Avg. Monthly Net</span>
+                <span className={`font-bold ${forecast.avgNet >= 0 ? "text-income-dark dark:text-green-400" : "text-expense dark:text-red-400"}`}>
+                  ${forecast.avgNet.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 italic">
+                Next month projection: ${forecast.avgNet.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="card">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">

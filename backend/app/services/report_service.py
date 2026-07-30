@@ -111,6 +111,45 @@ def balance_sheet(db: Session, user_id: str, as_of: date) -> dict:
     }
 
 
+def cash_flow(db: Session, user_id: str, start_date: date, end_date: date) -> dict:
+    q = (
+        db.query(
+            Category.name,
+            Category.type,
+            sqlfunc.sum(Entry.amount_minor).label("total_minor"),
+        )
+        .join(Entry, Entry.category_id == Category.id)
+        .filter(
+            Entry.user_id == uuid.UUID(user_id),
+            Entry.entry_date >= start_date,
+            Entry.entry_date <= end_date,
+        )
+        .group_by(Category.id, Category.name, Category.type)
+        .all()
+    )
+    operating_in = []
+    operating_out = []
+    total_in = 0.0
+    total_out = 0.0
+    for r in q:
+        val = _minor_to_float(r.total_minor)
+        if r.type == "income":
+            operating_in.append({"category": r.name, "total": val})
+            total_in += val
+        elif r.type == "expense":
+            operating_out.append({"category": r.name, "total": val})
+            total_out += val
+    net = round(total_in - total_out, 2)
+    return {
+        "period": {"start_date": start_date, "end_date": end_date},
+        "operating_inflow": operating_in,
+        "operating_outflow": operating_out,
+        "total_operating_inflow": round(total_in, 2),
+        "total_operating_outflow": round(total_out, 2),
+        "net_cash_flow": net,
+    }
+
+
 def ageing(db: Session, user_id: str, as_of: date) -> dict:
     entries = (
         db.query(Entry)

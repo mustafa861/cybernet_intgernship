@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { useAuthGuard } from "@/lib/auth";
 import type { TrialBalanceItem } from "@/types";
 import { Scale } from "lucide-react";
+import { ExportButtons } from "@/components/ExportButtons";
 
 export default function TrialBalancePage() {
   const { ready } = useAuthGuard();
@@ -20,14 +21,28 @@ export default function TrialBalancePage() {
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-          <Scale className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center justify-between gap-3 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+            <Scale className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Trial Balance</h1>
+            <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Category totals grouped by type</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Trial Balance</h1>
-          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Category totals grouped by type</p>
-        </div>
+        {data.length > 0 && (
+          <ExportButtons
+            filename="trial-balance"
+            title="Trial Balance"
+            columns={[
+              { header: "Category", key: "category" },
+              { header: "Type", key: "type" },
+              { header: "Total", key: "total" },
+            ]}
+            rows={data.map((r) => ({ ...r, total: `$${r.total.toLocaleString()}` }))}
+          />
+        )}
       </div>
 
       {loading ? (

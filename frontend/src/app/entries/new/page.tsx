@@ -26,9 +26,23 @@ export default function NewEntryPage() {
     description: string;
     contact_name?: string | null;
     contact_type?: string | null;
+    recurring?: boolean;
+    recurring_frequency?: string;
+    recurring_end_date?: string;
   }) => {
     setLoading(true);
     await api.createEntry(data);
+    if (data.recurring) {
+      await api.createRecurringEntry({
+        category_id: data.category_id,
+        entry_type: data.entry_type,
+        amount: data.amount,
+        description: data.description || null,
+        frequency: data.recurring_frequency || "monthly",
+        end_date: data.recurring_end_date || null,
+        next_run_date: data.entry_date,
+      });
+    }
     router.push("/entries");
   };
 

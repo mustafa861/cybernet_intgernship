@@ -114,6 +114,15 @@ export interface ChatResponse {
   actions_taken: { tool: string; input: Record<string, unknown>; result_summary: string }[];
 }
 
+export interface CashFlowResponse {
+  period: { start_date: string; end_date: string };
+  operating_inflow: CategoryTotal[];
+  operating_outflow: CategoryTotal[];
+  total_operating_inflow: number;
+  total_operating_outflow: number;
+  net_cash_flow: number;
+}
+
 export interface AgeingItem {
   contact_name: string;
   total: number;
@@ -128,6 +137,19 @@ export interface AgeingResponse {
   vendors: AgeingItem[];
   total_receivables: number;
   total_payables: number;
+}
+
+export interface RecurringEntryResponse {
+  id: string;
+  user_id: string;
+  category_id: string;
+  entry_type: string;
+  amount_minor: number;
+  description: string | null;
+  frequency: string;
+  end_date: string | null;
+  next_run_date: string;
+  created_at: string;
 }
 
 export interface ApiError {

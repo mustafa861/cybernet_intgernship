@@ -138,6 +138,13 @@ class ApiClient {
     );
   }
 
+  cashFlow(start_date: string, end_date: string) {
+    return this.request<CashFlowResponse>(
+      "GET",
+      `/reports/cash-flow?start_date=${start_date}&end_date=${end_date}`
+    );
+  }
+
   ageing(as_of?: string) {
     const qs = as_of ? `?as_of=${as_of}` : "";
     return this.request<AgeingResponse>("GET", `/reports/ageing${qs}`);
@@ -155,6 +162,33 @@ class ApiClient {
       message,
       conversation_id,
     });
+  }
+
+  // Recurring entries
+  createRecurringEntry(data: {
+    category_id: string;
+    entry_type: string;
+    amount: number;
+    description?: string | null;
+    frequency: string;
+    end_date?: string | null;
+    next_run_date: string;
+  }) {
+    return this.request<RecurringEntryResponse>("POST", "/recurring-entries", data);
+  }
+
+  listRecurringEntries() {
+    return this.request<RecurringEntryResponse[]>("GET", "/recurring-entries");
+  }
+
+  deleteRecurringEntry(id: string) {
+    return this.request<{ deleted: boolean }>("DELETE", `/recurring-entries/${id}`);
+  }
+
+  processRecurringEntries() {
+    return this.request<{ entries_created: number; details: string[] }>(
+      "POST", "/recurring-entries/process"
+    );
   }
 
   chatStream(
@@ -224,6 +258,8 @@ type ProfitLossResponse = import("../types").ProfitLossResponse;
 type BalanceSheetResponse = import("../types").BalanceSheetResponse;
 type MonthlyAuditResponse = import("../types").MonthlyAuditResponse;
 type AgeingResponse = import("../types").AgeingResponse;
+type CashFlowResponse = import("../types").CashFlowResponse;
+type RecurringEntryResponse = import("../types").RecurringEntryResponse;
 type ChatResponse = import("../types").ChatResponse;
 type ChatMessageResponse = import("../types").ChatMessageResponse;
 type ConversationSummary = import("../types").ConversationSummary;

@@ -26,6 +26,7 @@ class User(Base):
         "Category", back_populates="user"
     )
     entries: Mapped[list["Entry"]] = relationship("Entry", back_populates="user")
+    recurring_entries: Mapped[list["RecurringEntry"]] = relationship("RecurringEntry", back_populates="user")
     conversations: Mapped[list["Conversation"]] = relationship(
         "Conversation", back_populates="user"
     )
@@ -83,6 +84,7 @@ class Entry(Base):
     source: Mapped[str] = mapped_column(
         Enum("manual", "ai_agent", name="entry_source"),
     )
+    attachment_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     contact_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     contact_type: Mapped[str | None] = mapped_column(
         Enum("customer", "vendor", name="contact_type"), nullable=True,
@@ -99,6 +101,36 @@ class Entry(Base):
     audit_flags: Mapped[list["AuditFlag"]] = relationship(
         "AuditFlag", back_populates="entry"
     )
+
+
+class RecurringEntry(Base):
+    __tablename__ = "recurring_entries"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("users.id")
+    )
+    category_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("categories.id")
+    )
+    entry_type: Mapped[str] = mapped_column(
+        Enum("expense", "income", name="entry_type"),
+    )
+    amount_minor: Mapped[int] = mapped_column(BigInteger)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    frequency: Mapped[str] = mapped_column(
+        Enum("weekly", "monthly", name="recurring_frequency"),
+    )
+    end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    next_run_date: Mapped[date] = mapped_column(Date)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="recurring_entries")
+    category: Mapped["Category"] = relationship("Category")
 
 
 class AuditFlag(Base):

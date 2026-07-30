@@ -69,6 +69,7 @@ class EntryCreateRequest(BaseModel):
     source: str = Field(default="manual", pattern=r"^(manual|ai_agent)$")
     contact_name: str | None = None
     contact_type: str | None = Field(default=None, pattern=r"^(customer|vendor)$")
+    attachment_url: str | None = None
 
 
 class EntryUpdateRequest(BaseModel):
@@ -79,6 +80,7 @@ class EntryUpdateRequest(BaseModel):
     description: str | None = None
     contact_name: str | None = None
     contact_type: str | None = Field(default=None, pattern=r"^(customer|vendor)$")
+    attachment_url: str | None = None
 
 
 class EntryResponse(BaseModel):
@@ -93,6 +95,7 @@ class EntryResponse(BaseModel):
     source: str
     contact_name: str | None = None
     contact_type: str | None = None
+    attachment_url: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -105,6 +108,36 @@ class TrialBalanceItem(BaseModel):
     category: str
     type: str
     total: float
+
+
+class RecurringEntryCreateRequest(BaseModel):
+    category_id: uuid.UUID
+    entry_type: str = Field(pattern=r"^(expense|income)$")
+    amount: float = Field(gt=0, lt=1_000_000_000)
+    description: str | None = None
+    frequency: str = Field(pattern=r"^(weekly|monthly)$")
+    end_date: date | None = None
+    next_run_date: date
+
+
+class RecurringEntryResponse(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    category_id: uuid.UUID
+    entry_type: str
+    amount_minor: int
+    description: str | None = None
+    frequency: str
+    end_date: date | None = None
+    next_run_date: date
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class RecurringEntryProcessResponse(BaseModel):
+    entries_created: int
+    details: list[str]
 
 
 class PeriodRange(BaseModel):
@@ -183,6 +216,15 @@ class ActionTaken(BaseModel):
     tool: str
     input: dict
     result_summary: str
+
+
+class CashFlowResponse(BaseModel):
+    period: PeriodRange
+    operating_inflow: list[CategoryTotal]
+    operating_outflow: list[CategoryTotal]
+    total_operating_inflow: float
+    total_operating_outflow: float
+    net_cash_flow: float
 
 
 class AgeingItem(BaseModel):
