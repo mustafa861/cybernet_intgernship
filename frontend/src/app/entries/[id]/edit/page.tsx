@@ -53,6 +53,8 @@ export default function EditEntryPage() {
           amount: entry.amount_minor / 100,
           entry_date: entry.entry_date,
           description: entry.description || "",
+          contact_name: entry.contact_name,
+          contact_type: entry.contact_type,
         }}
         loading={loading}
       />

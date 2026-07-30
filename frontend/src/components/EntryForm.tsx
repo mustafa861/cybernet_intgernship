@@ -11,6 +11,8 @@ interface Props {
     amount: number;
     entry_date: string;
     description: string;
+    contact_name?: string | null;
+    contact_type?: string | null;
   }) => Promise<void>;
   initial?: {
     entry_type: string;
@@ -18,6 +20,8 @@ interface Props {
     amount: number;
     entry_date: string;
     description: string;
+    contact_name?: string | null;
+    contact_type?: string | null;
   };
   loading?: boolean;
 }
@@ -28,6 +32,8 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
   const [amount, setAmount] = useState(initial?.amount?.toString() || "");
   const [entryDate, setEntryDate] = useState(initial?.entry_date || "");
   const [description, setDescription] = useState(initial?.description || "");
+  const [contactName, setContactName] = useState(initial?.contact_name || "");
+  const [contactType, setContactType] = useState(initial?.contact_type || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +43,8 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
       amount: parseFloat(amount),
       entry_date: entryDate,
       description,
+      contact_name: contactName || null,
+      contact_type: (contactType as "customer" | "vendor" | null) || null,
     });
   };
 
@@ -131,6 +139,36 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
           />
         </div>
       </div>
+
+      <details className="group">
+        <summary className="text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+          AR / AP &mdash; <span className="text-xs font-normal normal-case text-primary-600 group-open:hidden">Show</span><span className="text-xs font-normal normal-case text-primary-600 hidden group-open:inline">Hide</span>
+        </summary>
+        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Contact Name</label>
+            <input
+              type="text"
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              className="input-field"
+              placeholder="Customer or vendor name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Contact Type</label>
+            <select
+              value={contactType}
+              onChange={(e) => setContactType(e.target.value)}
+              className="input-field"
+            >
+              <option value="">None</option>
+              <option value="customer">Customer (AR)</option>
+              <option value="vendor">Vendor (AP)</option>
+            </select>
+          </div>
+        </div>
+      </details>
 
       <div className="flex gap-3 pt-2">
         <button type="submit" disabled={loading} className="btn-primary">

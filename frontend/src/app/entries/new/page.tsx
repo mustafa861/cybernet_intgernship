@@ -24,6 +24,8 @@ export default function NewEntryPage() {
     amount: number;
     entry_date: string;
     description: string;
+    contact_name?: string | null;
+    contact_type?: string | null;
   }) => {
     setLoading(true);
     await api.createEntry(data);

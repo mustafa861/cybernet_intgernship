@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_current_user, get_db
 from app.schemas.pydantic_models import (
+    AgeingItem,
+    AgeingResponse,
     BalanceSheetResponse,
     CategoryTotal,
     MonthlyAuditRequest,
@@ -70,6 +72,23 @@ async def balance_sheet(
         equity=[CategoryTotal(**e) for e in result["equity"]],
         total_assets=result["total_assets"],
         total_liabilities_and_equity=result["total_liabilities_and_equity"],
+    )
+
+
+@router.get("/ageing", response_model=AgeingResponse)
+async def ageing_report(
+    as_of: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user),
+):
+    as_of_date = date.fromisoformat(as_of) if as_of else date.today()
+    result = report_service.ageing(db=db, user_id=user_id, as_of=as_of_date)
+    return AgeingResponse(
+        as_of=as_of_date,
+        customers=[AgeingItem(**c) for c in result["customers"]],
+        vendors=[AgeingItem(**v) for v in result["vendors"]],
+        total_receivables=result["total_receivables"],
+        total_payables=result["total_payables"],
     )
 
 

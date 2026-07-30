@@ -51,25 +51,40 @@ export default function EntriesPage() {
                   <th className="table-header px-6 py-4">Amount</th>
                   <th className="table-header px-6 py-4">Date</th>
                   <th className="table-header px-6 py-4">Description</th>
+                  <th className="table-header px-6 py-4">Contact</th>
                   <th className="table-header px-6 py-4">Source</th>
                   <th className="table-header px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {entries.map((e, i) => (
-                  <tr key={e.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-primary-50/30 transition-colors`}>
+                  <tr key={e.id} className={`${i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/50"} hover:bg-primary-50/30 dark:hover:bg-primary-900/20 transition-colors`}>
                     <td className="px-6 py-4">
                       <span className={e.entry_type === "expense" ? "badge-expense" : "badge-income"}>
                         {e.entry_type === "expense" ? "Expense" : "Income"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">
+                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">
                       ${(e.amount_minor / 100).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{e.entry_date}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{e.description || <span className="text-gray-300">&mdash;</span>}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{e.entry_date}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{e.description || <span className="text-gray-300 dark:text-gray-600">&mdash;</span>}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      {e.contact_name ? (
+                        <span className="inline-flex items-center gap-1">
+                          {e.contact_name}
+                          {e.contact_type && (
+                            <span className={`text-xs px-1.5 py-0.5 rounded ${
+                              e.contact_type === "customer" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                            }`}>
+                              {e.contact_type}
+                            </span>
+                          )}
+                        </span>
+                      ) : <span className="text-gray-300 dark:text-gray-600">&mdash;</span>}
+                    </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                         {e.source}
                       </span>
                     </td>

@@ -109,3 +109,76 @@ def balance_sheet(db: Session, user_id: str, as_of: date) -> dict:
         "total_assets": round(total_assets, 2),
         "total_liabilities_and_equity": round(total_liabilities_equity, 2),
     }
+
+
+def ageing(db: Session, user_id: str, as_of: date) -> dict:
+    entries = (
+        db.query(Entry)
+        .filter(
+            Entry.user_id == uuid.UUID(user_id),
+            Entry.contact_name.isnot(None),
+            Entry.contact_type.isnot(None),
+        )
+        .all()
+    )
+
+    buckets: dict[str, dict] = {}
+    for e in entries:
+        key = f"{e.contact_type}:{e.contact_name}"
+        if key not in buckets:
+            buckets[key] = {
+                "contact_name": e.contact_name,
+                "contact_type": e.contact_type,
+                "total": 0.0,
+                "current": 0.0,
+                "days_31_60": 0.0,
+                "days_60_plus": 0.0,
+            }
+        days_overdue = (as_of - e.entry_date).days
+        amount = _minor_to_float(e.amount_minor)
+
+        if e.entry_type == "income":
+            # AR: customer owes us money
+            buckets[key]["total"] += amount
+            if days_overdue <= 30:
+                buckets[key]["current"] += amount
+            elif days_overdue <= 60:
+                buckets[key]["days_31_60"] += amount
+            else:
+                buckets[key]["days_60_plus"] += amount
+        elif e.entry_type == "expense":
+            # AP: we owe money to vendor
+            buckets[key]["total"] += amount
+            if days_overdue <= 30:
+                buckets[key]["current"] += amount
+            elif days_overdue <= 60:
+                buckets[key]["days_31_60"] += amount
+            else:
+                buckets[key]["days_60_plus"] += amount
+
+    customers = []
+    vendors = []
+    total_receivables = 0.0
+    total_payables = 0.0
+    for b in buckets.values():
+        item = {
+            "contact_name": b["contact_name"],
+            "total": round(b["total"], 2),
+            "current": round(b["current"], 2),
+            "days_31_60": round(b["days_31_60"], 2),
+            "days_60_plus": round(b["days_60_plus"], 2),
+        }
+        if b["contact_type"] == "customer":
+            customers.append(item)
+            total_receivables += b["total"]
+        else:
+            vendors.append(item)
+            total_payables += b["total"]
+
+    return {
+        "as_of": as_of,
+        "customers": customers,
+        "vendors": vendors,
+        "total_receivables": round(total_receivables, 2),
+        "total_payables": round(total_payables, 2),
+    }

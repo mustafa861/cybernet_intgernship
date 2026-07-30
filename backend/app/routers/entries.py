@@ -31,6 +31,8 @@ def _entry_to_response(e: Entry) -> EntryResponse:
         entry_date=e.entry_date,
         description=e.description,
         source=e.source,
+        contact_name=e.contact_name,
+        contact_type=e.contact_type,
         created_at=e.created_at,
         updated_at=e.updated_at,
     )
@@ -61,6 +63,8 @@ async def create_entry(
         entry_date=body.entry_date,
         description=body.description,
         source=body.source,
+        contact_name=body.contact_name,
+        contact_type=body.contact_type,
     )
     db.add(entry)
     db.commit()
@@ -116,6 +120,10 @@ async def update_entry(
         entry.entry_date = body.entry_date
     if body.description is not None:
         entry.description = body.description
+    if body.contact_name is not None:
+        entry.contact_name = body.contact_name
+    if body.contact_type is not None:
+        entry.contact_type = body.contact_type
     db.commit()
     db.refresh(entry)
     return _entry_to_response(entry)

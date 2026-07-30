@@ -138,6 +138,11 @@ class ApiClient {
     );
   }
 
+  ageing(as_of?: string) {
+    const qs = as_of ? `?as_of=${as_of}` : "";
+    return this.request<AgeingResponse>("GET", `/reports/ageing${qs}`);
+  }
+
   monthlyAudit(month: string) {
     return this.request<MonthlyAuditResponse>("POST", "/reports/monthly-audit", {
       month,
@@ -218,6 +223,7 @@ type Category = import("../types").Category;
 type ProfitLossResponse = import("../types").ProfitLossResponse;
 type BalanceSheetResponse = import("../types").BalanceSheetResponse;
 type MonthlyAuditResponse = import("../types").MonthlyAuditResponse;
+type AgeingResponse = import("../types").AgeingResponse;
 type ChatResponse = import("../types").ChatResponse;
 type ChatMessageResponse = import("../types").ChatMessageResponse;
 type ConversationSummary = import("../types").ConversationSummary;

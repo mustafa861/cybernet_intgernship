@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Scale, ChartPie, FileSpreadsheet, ArrowRight } from "lucide-react";
+import { Scale, ChartPie, FileSpreadsheet, Clock, ArrowRight } from "lucide-react";
 
 const reports = [
   {
@@ -7,21 +7,28 @@ const reports = [
     title: "Trial Balance",
     desc: "Category totals grouped by type",
     icon: Scale,
-    color: "text-blue-600 bg-blue-50",
+    color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",
   },
   {
     href: "/reports/profit-loss",
     title: "Profit & Loss",
     desc: "Income, expenses, and net profit for a period",
     icon: ChartPie,
-    color: "text-green-600 bg-green-50",
+    color: "text-green-600 bg-green-50 dark:bg-green-900/20",
   },
   {
     href: "/reports/balance-sheet",
     title: "Balance Sheet",
     desc: "Assets, liabilities, and equity as of a date",
     icon: FileSpreadsheet,
-    color: "text-purple-600 bg-purple-50",
+    color: "text-purple-600 bg-purple-50 dark:bg-purple-900/20",
+  },
+  {
+    href: "/reports/ageing",
+    title: "Ageing Report",
+    desc: "AR/AP overdue buckets by customer and vendor",
+    icon: Clock,
+    color: "text-orange-600 bg-orange-50 dark:bg-orange-900/20",
   },
 ];
 

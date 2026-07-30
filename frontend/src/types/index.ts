@@ -27,6 +27,8 @@ export interface Entry {
   entry_date: string;
   description: string | null;
   source: "manual" | "ai_agent";
+  contact_name: string | null;
+  contact_type: "customer" | "vendor" | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +40,8 @@ export interface EntryCreate {
   entry_date: string;
   description?: string | null;
   source?: "manual" | "ai_agent";
+  contact_name?: string | null;
+  contact_type?: "customer" | "vendor" | null;
 }
 
 export interface TrialBalanceItem {
@@ -108,6 +112,22 @@ export interface ChatResponse {
   conversation_id: string;
   reply: string;
   actions_taken: { tool: string; input: Record<string, unknown>; result_summary: string }[];
+}
+
+export interface AgeingItem {
+  contact_name: string;
+  total: number;
+  current: number;
+  days_31_60: number;
+  days_60_plus: number;
+}
+
+export interface AgeingResponse {
+  as_of: string;
+  customers: AgeingItem[];
+  vendors: AgeingItem[];
+  total_receivables: number;
+  total_payables: number;
 }
 
 export interface ApiError {
