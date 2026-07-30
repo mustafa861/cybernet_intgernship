@@ -33,6 +33,7 @@ def _entry_to_response(e: Entry) -> EntryResponse:
         source=e.source,
         contact_name=e.contact_name,
         contact_type=e.contact_type,
+        attachment_url=e.attachment_url,
         created_at=e.created_at,
         updated_at=e.updated_at,
     )
@@ -65,6 +66,7 @@ async def create_entry(
         source=body.source,
         contact_name=body.contact_name,
         contact_type=body.contact_type,
+        attachment_url=body.attachment_url,
     )
     db.add(entry)
     db.commit()
