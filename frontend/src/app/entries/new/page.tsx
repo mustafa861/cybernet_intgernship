@@ -37,8 +37,8 @@ export default function NewEntryPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">New Entry</h1>
-        <p className="text-sm text-gray-500 mt-1">Record a new income or expense transaction</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">New Entry</h1>
+        <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Record a new income or expense transaction</p>
       </div>
       <EntryForm categories={categories} onSubmit={handleSubmit} loading={loading} />
     </div>

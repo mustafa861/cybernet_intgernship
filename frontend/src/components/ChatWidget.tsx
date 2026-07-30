@@ -65,7 +65,7 @@ export function ChatWidget({ conversationId, onUpdate }: Props) {
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Bot className="w-12 h-12 text-primary-200 mb-3" />
-            <p className="text-gray-400 text-sm max-w-sm">
+            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-sm">
               Ask me anything about your finances &mdash; add an entry, generate a report, run an audit.
             </p>
           </div>
@@ -73,17 +73,17 @@ export function ChatWidget({ conversationId, onUpdate }: Props) {
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-              m.role === "user" ? "bg-primary-100" : "bg-gray-100"
+              m.role === "user" ? "bg-primary-100 dark:bg-primary-900/30" : "bg-gray-100 dark:bg-gray-800"
             }`}>
               {m.role === "user"
-                ? <User className="w-4 h-4 text-primary-600" />
-                : <Bot className="w-4 h-4 text-gray-500" />
+                ? <User className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                : <Bot className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               }
             </div>
             <div className={`rounded-xl px-4 py-2.5 max-w-[75%] whitespace-pre-wrap text-sm leading-relaxed ${
               m.role === "user"
                 ? "bg-primary-600 text-white rounded-tr-sm"
-                : "bg-gray-100 text-gray-800 rounded-tl-sm"
+                : "bg-gray-100 text-gray-800 rounded-tl-sm dark:bg-gray-800 dark:text-gray-200"
             }`}>
               {m.content || (loading && i === messages.length - 1 ? (
                 <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
@@ -93,7 +93,7 @@ export function ChatWidget({ conversationId, onUpdate }: Props) {
         ))}
         <div ref={bottomRef} />
       </div>
-      <div className="border-t border-gray-200 p-3 bg-white">
+      <div className="border-t border-gray-200 dark:border-gray-800 p-3 bg-white dark:bg-gray-900">
         <div className="flex gap-2">
           <input
             value={input}

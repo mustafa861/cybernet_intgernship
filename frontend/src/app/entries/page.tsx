@@ -29,8 +29,8 @@ export default function EntriesPage() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Entries</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your income and expense records</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Entries</h1>
+          <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Manage your income and expense records</p>
         </div>
         <Link href="/entries/new" className="btn-primary inline-flex items-center gap-2 self-start sm:self-auto">
           <Plus className="w-4 h-4" /> New Entry
@@ -46,7 +46,7 @@ export default function EntriesPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
+                <tr className="bg-gray-50 border-b border-gray-200 dark:bg-gray-800/50 dark:border-gray-700">
                   <th className="table-header px-6 py-4">Type</th>
                   <th className="table-header px-6 py-4">Amount</th>
                   <th className="table-header px-6 py-4">Date</th>

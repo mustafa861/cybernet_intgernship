@@ -33,7 +33,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] gap-0 -m-4 sm:-m-6 lg:-m-8">
-      <div className="hidden md:block w-72 shrink-0 border-r border-gray-200">
+      <div className="hidden md:block w-72 shrink-0 border-r border-gray-200 dark:border-gray-800">
         <ChatHistory
           activeId={convId}
           onNew={handleNewChat}
@@ -45,7 +45,7 @@ export default function ChatPage() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/30" onClick={() => setSidebarOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
+          <div className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-gray-900 shadow-xl">
             <ChatHistory
               activeId={convId}
               onNew={handleNewChat}
@@ -56,22 +56,22 @@ export default function ChatPage() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 bg-white">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors md:hidden"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div className="flex items-center gap-2">
-              <MessageSquareText className="w-5 h-5 text-primary-600" />
-              <h1 className="text-lg font-bold text-gray-900">AI Assistant</h1>
+              <MessageSquareText className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">AI Assistant</h1>
             </div>
           </div>
           {user && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">{user.business_name}</span>
             </div>

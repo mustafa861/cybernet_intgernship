@@ -36,8 +36,8 @@ export default function ReportsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="text-sm text-gray-500 mt-1">Financial statements and summaries</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Reports</h1>
+        <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">Financial statements and summaries</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {reports.map((r) => {
@@ -51,11 +51,11 @@ export default function ReportsPage() {
               <div className={`w-12 h-12 rounded-lg ${r.color} flex items-center justify-center mb-4`}>
                 <Icon className="w-6 h-6" />
               </div>
-              <h2 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
+              <h2 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors dark:text-gray-100 dark:group-hover:text-primary-400">
                 {r.title}
               </h2>
-              <p className="text-sm text-gray-500 mt-1.5">{r.desc}</p>
-              <div className="flex items-center gap-1 mt-4 text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity">
+              <p className="text-sm text-gray-500 mt-1.5 dark:text-gray-400">{r.desc}</p>
+              <div className="flex items-center gap-1 mt-4 text-sm font-medium text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity dark:text-primary-400">
                 View report <ArrowRight className="w-4 h-4" />
               </div>
             </Link>
