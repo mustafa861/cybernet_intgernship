@@ -42,11 +42,16 @@ class CategoryResponse(BaseModel):
     id: uuid.UUID
     name: str
     type: str
+    parent_id: uuid.UUID | None = None
+    children: list["CategoryResponse"] = []
+
+    model_config = {"from_attributes": True}
 
 
 class CategoryCreateRequest(BaseModel):
     name: str
     type: str = Field(pattern=r"^(expense|income|asset|liability|equity)$")
+    parent_id: uuid.UUID | None = None
 
 
 class EntryCreateRequest(BaseModel):

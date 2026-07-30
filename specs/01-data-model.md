@@ -14,15 +14,23 @@ Status: Draft
 | created_at | TIMESTAMPTZ | default now() |
 
 ### `categories`
-Chart-of-accounts style classification, scoped per user/business.
+Chart-of-accounts style classification with hierarchical parent-child relationship, scoped per user/business.
 
 | Column | Type | Notes |
 |---|---|---|
 | id | UUID, PK | |
 | user_id | UUID, FK -> users.id | |
-| name | TEXT | e.g. "Rent", "Utilities", "Sales Income" |
+| parent_id | UUID, FK -> categories.id, nullable | self-referential FK for hierarchy; null = top-level account |
+| name | TEXT | e.g. "Cash", "Bank", "Accounts Receivable" |
 | type | ENUM('expense','income','asset','liability','equity') | |
 | created_at | TIMESTAMPTZ | default now() |
+
+Hierarchy examples by type:
+- **Assets**: Cash, Bank, Accounts Receivable, Inventory, Fixed Assets
+- **Liabilities**: Accounts Payable, Loans Payable, Credit Cards
+- **Equity**: Owner's Equity, Retained Earnings, Drawings
+- **Income**: Sales Revenue, Service Revenue, Interest Income
+- **Expenses**: Rent Expense, Utilities, Salaries, Office Supplies
 
 ### `entries`
 The core ledger table. Every expense, income, or manual journal line is a row here.
@@ -57,6 +65,8 @@ Populated by the monthly-audit feature (see `05-feature-monthly-audit.md`).
 
 - One `user` has many `categories` and many `entries`.
 - One `category` has many `entries`.
+- One `category` has an optional `parent` category (self-referential FK).
+- One `category` has zero or more `children` categories (self-referential FK).
 - One `entry` has zero or more `audit_flags`.
 
 ## Indexes

@@ -38,6 +38,9 @@ class Category(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("users.id")
     )
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("categories.id"), nullable=True
+    )
     name: Mapped[str] = mapped_column(Text)
     type: Mapped[str] = mapped_column(
         Enum("expense", "income", "asset", "liability", "equity", name="category_type"),
@@ -48,6 +51,12 @@ class Category(Base):
 
     user: Mapped["User"] = relationship("User", back_populates="categories")
     entries: Mapped[list["Entry"]] = relationship("Entry", back_populates="category")
+    parent: Mapped["Category | None"] = relationship(
+        "Category", back_populates="children", remote_side="Category.id", foreign_keys=[parent_id],
+    )
+    children: Mapped[list["Category"]] = relationship(
+        "Category", back_populates="parent", foreign_keys=[parent_id],
+    )
 
 
 class Entry(Base):
