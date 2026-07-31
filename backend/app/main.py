@@ -33,6 +33,8 @@ app = FastAPI(title="Accounting Assistant API", version="0.1.0", lifespan=lifesp
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
         "https://caaccountingai-p1.vercel.app",
         "https://cybernet-intgernship.vercel.app",
         "https://cybernet-intgernship.onrender.com",
@@ -75,6 +77,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
             "error": {
                 "code": "INTERNAL_ERROR",
                 "message": "An unexpected error occurred",
+                "detail": f"{type(exc).__name__}: {exc}",
             }
         },
     )
