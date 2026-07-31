@@ -18,22 +18,20 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 async def chat(
     body: ChatRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
-    uid = uuid.UUID(user_id)
-
     if body.conversation_id:
         conv = (
             db.query(Conversation)
-            .filter(Conversation.id == body.conversation_id, Conversation.user_id == uid)
+            .filter(Conversation.id == body.conversation_id, Conversation.user_id == user_id)
             .first()
         )
         if not conv:
-            conv = Conversation(id=body.conversation_id, user_id=uid)
+            conv = Conversation(id=body.conversation_id, user_id=user_id)
             db.add(conv)
             db.flush()
     else:
-        conv = Conversation(user_id=uid)
+        conv = Conversation(user_id=user_id)
         db.add(conv)
         db.flush()
 
@@ -47,7 +45,7 @@ async def chat(
     is_first = len(messages_before) == 0
 
     reply, actions, _ = run_agent(
-        db=db, user_id=user_id, message=body.message, conversation_history=history
+        db=db, user_id=str(user_id), message=body.message, conversation_history=history
     )
 
     db_user_msg = ChatMessage(
@@ -87,22 +85,20 @@ async def chat(
 async def chat_stream(
     body: ChatRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
-    uid = uuid.UUID(user_id)
-
     if body.conversation_id:
         conv = (
             db.query(Conversation)
-            .filter(Conversation.id == body.conversation_id, Conversation.user_id == uid)
+            .filter(Conversation.id == body.conversation_id, Conversation.user_id == user_id)
             .first()
         )
         if not conv:
-            conv = Conversation(id=body.conversation_id, user_id=uid)
+            conv = Conversation(id=body.conversation_id, user_id=user_id)
             db.add(conv)
             db.flush()
     else:
-        conv = Conversation(user_id=uid)
+        conv = Conversation(user_id=user_id)
         db.add(conv)
         db.flush()
 
@@ -127,7 +123,7 @@ async def chat_stream(
     async def event_stream():
         try:
             reply, actions, _ = run_agent(
-                db=db, user_id=user_id, message=body.message, conversation_history=history
+                db=db, user_id=str(user_id), message=body.message, conversation_history=history
             )
 
             yield f"event: meta\ndata: {json.dumps({'conversation_id': str(conv_id)})}\n\n"
@@ -152,8 +148,8 @@ async def chat_stream(
             db.commit()
 
             yield f"event: done\ndata: {json.dumps({'actions_taken': [{'tool': a.tool, 'input': a.input, 'result_summary': a.result_summary} for a in actions]})}\n\n"
-        except Exception:
+        except Exception as e:
             db.rollback()
-            raise
+            yield f"event: error\ndata: {json.dumps({'message': f'{type(e).__name__}: {e}'})}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

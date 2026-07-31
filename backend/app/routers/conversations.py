@@ -1,10 +1,11 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_current_user, get_db
-from app.models import Conversation
+from app.models import ChatMessage, Conversation
 from app.schemas.pydantic_models import (
     ConversationDetail,
     ConversationSummary,
@@ -17,21 +18,30 @@ router = APIRouter(prefix="/conversations", tags=["conversations"])
 @router.get("", response_model=list[ConversationSummary])
 async def list_conversations(
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     convs = (
         db.query(Conversation)
-        .filter(Conversation.user_id == uuid.UUID(user_id))
+        .filter(Conversation.user_id == user_id)
         .order_by(Conversation.updated_at.desc())
         .all()
     )
+    message_counts: dict[uuid.UUID, int] = {}
+    if convs:
+        counts = (
+            db.query(ChatMessage.conversation_id, func.count(ChatMessage.id))
+            .filter(ChatMessage.conversation_id.in_([c.id for c in convs]))
+            .group_by(ChatMessage.conversation_id)
+            .all()
+        )
+        message_counts = {conv_id: count for conv_id, count in counts}
     return [
         ConversationSummary(
             id=c.id,
             title=c.title,
             created_at=c.created_at,
             updated_at=c.updated_at,
-            message_count=len(c.messages),
+            message_count=message_counts.get(c.id, 0),
         )
         for c in convs
     ]
@@ -41,13 +51,13 @@ async def list_conversations(
 async def get_conversation(
     conv_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     conv = (
         db.query(Conversation)
         .filter(
             Conversation.id == conv_id,
-            Conversation.user_id == uuid.UUID(user_id),
+            Conversation.user_id == user_id,
         )
         .first()
     )
@@ -69,13 +79,13 @@ async def get_conversation(
 async def delete_conversation(
     conv_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     conv = (
         db.query(Conversation)
         .filter(
             Conversation.id == conv_id,
-            Conversation.user_id == uuid.UUID(user_id),
+            Conversation.user_id == user_id,
         )
         .first()
     )

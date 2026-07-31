@@ -46,7 +46,10 @@ class Category(Base):
     )
     name: Mapped[str] = mapped_column(Text)
     type: Mapped[str] = mapped_column(
-        Enum("expense", "income", "asset", "liability", "equity", name="category_type"),
+        Enum(
+            "expense", "income", "asset", "liability", "equity",
+            name="category_type", native_enum=False,
+        ),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -75,19 +78,19 @@ class Entry(Base):
         Uuid, ForeignKey("categories.id")
     )
     entry_type: Mapped[str] = mapped_column(
-        Enum("expense", "income", name="entry_type"),
+        Enum("expense", "income", name="entry_type", native_enum=False),
     )
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     currency: Mapped[str] = mapped_column(Text, default="PKR")
     entry_date: Mapped[date] = mapped_column(Date)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     source: Mapped[str] = mapped_column(
-        Enum("manual", "ai_agent", name="entry_source"),
+        Enum("manual", "ai_agent", name="entry_source", native_enum=False),
     )
     attachment_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     contact_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     contact_type: Mapped[str | None] = mapped_column(
-        Enum("customer", "vendor", name="contact_type"), nullable=True,
+        Enum("customer", "vendor", name="contact_type", native_enum=False), nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -116,12 +119,12 @@ class RecurringEntry(Base):
         Uuid, ForeignKey("categories.id")
     )
     entry_type: Mapped[str] = mapped_column(
-        Enum("expense", "income", name="entry_type"),
+        Enum("expense", "income", name="entry_type", native_enum=False),
     )
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     frequency: Mapped[str] = mapped_column(
-        Enum("weekly", "monthly", name="recurring_frequency"),
+        Enum("weekly", "monthly", name="recurring_frequency", native_enum=False),
     )
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     next_run_date: Mapped[date] = mapped_column(Date)
@@ -145,7 +148,7 @@ class AuditFlag(Base):
     month: Mapped[date] = mapped_column(Date)
     reason: Mapped[str] = mapped_column(Text)
     severity: Mapped[str] = mapped_column(
-        Enum("low", "medium", "high", name="audit_severity"),
+        Enum("low", "medium", "high", name="audit_severity", native_enum=False),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

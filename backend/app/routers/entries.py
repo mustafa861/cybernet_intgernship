@@ -43,11 +43,10 @@ def _entry_to_response(e: Entry) -> EntryResponse:
 async def create_entry(
     body: EntryCreateRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
-    user_uuid = uuid.UUID(user_id)
     cat = db.query(Category).filter(
-        Category.id == body.category_id, Category.user_id == user_uuid
+        Category.id == body.category_id, Category.user_id == user_id
     ).first()
     if not cat:
         raise HTTPException(
@@ -56,7 +55,7 @@ async def create_entry(
         )
     entry = Entry(
         id=uuid.uuid4(),
-        user_id=user_uuid,
+        user_id=user_id,
         category_id=body.category_id,
         entry_type=body.entry_type,
         amount_minor=amount_to_minor(body.amount),
@@ -81,9 +80,9 @@ async def list_entries(
     category_id: uuid.UUID | None = Query(None),
     entry_type: str | None = Query(None),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
-    q = db.query(Entry).filter(Entry.user_id == uuid.UUID(user_id))
+    q = db.query(Entry).filter(Entry.user_id == user_id)
     if start_date:
         q = q.filter(Entry.entry_date >= date.fromisoformat(start_date))
     if end_date:
@@ -100,10 +99,10 @@ async def update_entry(
     entry_id: uuid.UUID,
     body: EntryUpdateRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     entry = db.query(Entry).filter(
-        Entry.id == entry_id, Entry.user_id == uuid.UUID(user_id)
+        Entry.id == entry_id, Entry.user_id == user_id
     ).first()
     if not entry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
@@ -111,7 +110,7 @@ async def update_entry(
         entry.entry_type = body.entry_type
     if body.category_id is not None:
         cat = db.query(Category).filter(
-            Category.id == body.category_id, Category.user_id == uuid.UUID(user_id)
+            Category.id == body.category_id, Category.user_id == user_id
         ).first()
         if not cat:
             raise HTTPException(status_code=404, detail="Category not found")
@@ -137,10 +136,10 @@ async def update_entry(
 async def delete_entry(
     entry_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     entry = db.query(Entry).filter(
-        Entry.id == entry_id, Entry.user_id == uuid.UUID(user_id)
+        Entry.id == entry_id, Entry.user_id == user_id
     ).first()
     if not entry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
