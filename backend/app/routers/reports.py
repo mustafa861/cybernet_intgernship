@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -25,7 +26,7 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 async def trial_balance(
     as_of: str | None = Query(None),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     as_of_date = date.fromisoformat(as_of) if as_of else None
     results = report_service.trial_balance(db=db, user_id=user_id, as_of=as_of_date)
@@ -37,7 +38,7 @@ async def profit_and_loss(
     start_date: str = Query(),
     end_date: str = Query(),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     try:
         sd = date.fromisoformat(start_date)
@@ -59,7 +60,7 @@ async def profit_and_loss(
 async def balance_sheet(
     as_of: str = Query(),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     try:
         as_of_date = date.fromisoformat(as_of)
@@ -81,7 +82,7 @@ async def cash_flow(
     start_date: str = Query(),
     end_date: str = Query(),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     try:
         sd = date.fromisoformat(start_date)
@@ -103,7 +104,7 @@ async def cash_flow(
 async def ageing_report(
     as_of: str | None = Query(None),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     as_of_date = date.fromisoformat(as_of) if as_of else date.today()
     result = report_service.ageing(db=db, user_id=user_id, as_of=as_of_date)
@@ -120,7 +121,7 @@ async def ageing_report(
 async def monthly_audit(
     body: MonthlyAuditRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     result = audit_service.run_audit(db=db, user_id=user_id, month=body.month)
     return MonthlyAuditResponse(
