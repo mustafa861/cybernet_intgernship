@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from app.config import Settings
-from app.routers import auth, categories, chat, conversations, entries, recurring_entries, reports
+from app.routers import auth, categories, chat, conversations, entries, health, recurring_entries, reports
 
 settings = Settings()
 
@@ -24,7 +24,9 @@ async def lifespan(app: FastAPI):
         command.upgrade(alembic_cfg, "head")
         print("MIGRATIONS: ran successfully")
     except Exception as e:
+        import traceback
         print(f"MIGRATIONS: failed — {e}")
+        traceback.print_exc()
     yield
 
 
@@ -90,3 +92,4 @@ app.include_router(reports.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(conversations.router, prefix="/api")
 app.include_router(recurring_entries.router, prefix="/api")
+app.include_router(health.router, prefix="/api")
