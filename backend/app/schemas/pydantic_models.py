@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class ErrorDetail(BaseModel):
@@ -58,6 +58,11 @@ class CategoryCreateRequest(BaseModel):
     name: str
     type: str = Field(pattern=r"^(expense|income|asset|liability|equity)$")
     parent_id: uuid.UUID | None = None
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def _normalize_type(cls, v: object) -> object:
+        return v.lower() if isinstance(v, str) else v
 
 
 class EntryCreateRequest(BaseModel):

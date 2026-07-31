@@ -34,11 +34,11 @@ def _build_tree(categories: list[Category]) -> list[CategoryResponse]:
 @router.get("", response_model=list[CategoryResponse])
 async def list_categories(
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     categories = (
         db.query(Category)
-        .filter(Category.user_id == uuid.UUID(user_id))
+        .filter(Category.user_id == user_id)
         .all()
     )
     return _build_tree(categories)
@@ -48,12 +48,12 @@ async def list_categories(
 async def create_category(
     body: CategoryCreateRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
+    user_id: uuid.UUID = Depends(get_current_user),
 ):
     existing = (
         db.query(Category)
         .filter(
-            Category.user_id == uuid.UUID(user_id),
+            Category.user_id == user_id,
             Category.name == body.name,
         )
         .first()
@@ -69,7 +69,7 @@ async def create_category(
             db.query(Category)
             .filter(
                 Category.id == body.parent_id,
-                Category.user_id == uuid.UUID(user_id),
+                Category.user_id == user_id,
             )
             .first()
         )
@@ -81,7 +81,7 @@ async def create_category(
 
     category = Category(
         id=uuid.uuid4(),
-        user_id=uuid.UUID(user_id),
+        user_id=user_id,
         name=body.name,
         type=body.type,
         parent_id=body.parent_id,
