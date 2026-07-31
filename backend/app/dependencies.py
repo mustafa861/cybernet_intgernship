@@ -16,13 +16,16 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
-) -> uuid.UUID:
+) -> str:
     token = credentials.credentials
     try:
         payload = jwt.decode(
@@ -34,7 +37,7 @@ def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token",
             )
-        return uuid.UUID(user_id)
+        return str(uuid.UUID(user_id))
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
