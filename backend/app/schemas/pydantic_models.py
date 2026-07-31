@@ -66,7 +66,7 @@ class CategoryCreateRequest(BaseModel):
 
 
 class EntryCreateRequest(BaseModel):
-    entry_type: str = Field(pattern=r"^(expense|income)$")
+    entry_type: str = Field(pattern=r"^(expense|income|asset|liability|equity)$")
     category_id: uuid.UUID
     amount: float = Field(gt=0, lt=1_000_000_000)
     entry_date: date
@@ -78,7 +78,7 @@ class EntryCreateRequest(BaseModel):
 
 
 class EntryUpdateRequest(BaseModel):
-    entry_type: str | None = Field(default=None, pattern=r"^(expense|income)$")
+    entry_type: str | None = Field(default=None, pattern=r"^(expense|income|asset|liability|equity)$")
     category_id: uuid.UUID | None = None
     amount: float | None = Field(default=None, gt=0, lt=1_000_000_000)
     entry_date: date | None = None
@@ -117,7 +117,7 @@ class TrialBalanceItem(BaseModel):
 
 class RecurringEntryCreateRequest(BaseModel):
     category_id: uuid.UUID
-    entry_type: str = Field(pattern=r"^(expense|income)$")
+    entry_type: str = Field(pattern=r"^(expense|income|asset|liability|equity)$")
     amount: float = Field(gt=0, lt=1_000_000_000)
     description: str | None = None
     frequency: str = Field(pattern=r"^(weekly|monthly)$")

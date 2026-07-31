@@ -17,11 +17,13 @@ export interface Category {
   children: Category[];
 }
 
+export type EntryType = "expense" | "income" | "asset" | "liability" | "equity";
+
 export interface Entry {
   id: string;
   user_id: string;
   category_id: string;
-  entry_type: "expense" | "income";
+  entry_type: EntryType;
   amount_minor: number;
   currency: string;
   entry_date: string;
@@ -35,7 +37,7 @@ export interface Entry {
 }
 
 export interface EntryCreate {
-  entry_type: "expense" | "income";
+  entry_type: EntryType;
   category_id: string;
   amount: number;
   entry_date: string;

@@ -62,40 +62,32 @@ export function EntryForm({ categories, onSubmit, initial, loading }: Props) {
     });
   };
 
-  const filtered = categories.filter((c) => {
-    if (entryType === "expense") return c.type === "expense";
-    if (entryType === "income") return c.type === "income";
-    return true;
-  });
+  const filtered = categories.filter((c) => c.type === entryType);
 
   return (
     <form onSubmit={handleSubmit} className="card p-6 max-w-lg space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-          <div className="flex rounded-lg border border-gray-300 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setEntryType("expense")}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                entryType === "expense"
-                  ? "bg-expense text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              Expense
-            </button>
-            <button
-              type="button"
-              onClick={() => setEntryType("income")}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                entryType === "income"
-                  ? "bg-income text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              Income
-            </button>
+          <div className="flex flex-wrap rounded-lg border border-gray-300 overflow-hidden">
+            {(["expense", "income", "asset", "liability", "equity"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setEntryType(t)}
+                className={`flex-1 min-w-[70px] py-2 text-sm font-medium transition-colors ${
+                  entryType === t
+                    ? t === "expense"
+                      ? "bg-expense text-white"
+                      : t === "income"
+                        ? "bg-income text-white"
+                        : "bg-primary-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
         <div>

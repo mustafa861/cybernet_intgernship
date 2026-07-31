@@ -78,7 +78,7 @@ class Entry(Base):
         Uuid, ForeignKey("categories.id")
     )
     entry_type: Mapped[str] = mapped_column(
-        Enum("expense", "income", name="entry_type", native_enum=False),
+        Enum("expense", "income", "asset", "liability", "equity", name="entry_type", native_enum=False),
     )
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     currency: Mapped[str] = mapped_column(Text, default="PKR")
@@ -119,7 +119,7 @@ class RecurringEntry(Base):
         Uuid, ForeignKey("categories.id")
     )
     entry_type: Mapped[str] = mapped_column(
-        Enum("expense", "income", name="entry_type", native_enum=False),
+        Enum("expense", "income", "asset", "liability", "equity", name="entry_type", native_enum=False),
     )
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

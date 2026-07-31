@@ -286,8 +286,8 @@ export default function DashboardPage() {
                   } hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={e.entry_type === "expense" ? "badge-expense" : "badge-income"}>
-                      {e.entry_type}
+                    <span className={e.entry_type === "expense" ? "badge-expense" : e.entry_type === "income" ? "badge-income" : "badge-neutral"}>
+                      {e.entry_type.charAt(0).toUpperCase() + e.entry_type.slice(1)}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">{e.description || e.id.slice(0, 8)}</span>
                   </div>

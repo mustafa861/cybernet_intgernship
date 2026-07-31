@@ -92,8 +92,8 @@ export default function EntriesPage() {
                 {entries.map((e, i) => (
                   <tr key={e.id} className={`${i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/50"} hover:bg-primary-50/30 dark:hover:bg-primary-900/20 transition-colors`}>
                     <td className="px-6 py-4">
-                      <span className={e.entry_type === "expense" ? "badge-expense" : "badge-income"}>
-                        {e.entry_type === "expense" ? "Expense" : "Income"}
+                      <span className={e.entry_type === "expense" ? "badge-expense" : e.entry_type === "income" ? "badge-income" : "badge-neutral"}>
+                        {e.entry_type.charAt(0).toUpperCase() + e.entry_type.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">

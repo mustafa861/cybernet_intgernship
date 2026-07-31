@@ -34,7 +34,7 @@ class Tool:
 class CreateEntryTool(Tool):
     def __init__(self):
         class Params(BaseModel):
-            entry_type: str = Field(pattern=r"^(expense|income)$")
+            entry_type: str = Field(pattern=r"^(expense|income|asset|liability|equity)$")
             category_id: str
             amount: float = Field(gt=0)
             entry_date: str
@@ -69,7 +69,7 @@ class UpdateEntryTool(Tool):
         class Params(BaseModel):
             entry_id: str
             entry_type: str | None = Field(
-                default=None, pattern=r"^(expense|income)$"
+                default=None, pattern=r"^(expense|income|asset|liability|equity)$"
             )
             category_id: str | None = None
             amount: float | None = Field(default=None, gt=0)
